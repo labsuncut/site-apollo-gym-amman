@@ -1,0 +1,17 @@
+{
+  "_note": "Facts about Apollo. Empty fields are waiting for the client; never guess them. The site reads its words from assets/js/content.js.",
+  "name": "Apollo",
+  "tagline": "",
+  "category": "Gym",
+  "phone": "",
+  "whatsapp": "",
+  "email": "",
+  "address": { "street": "", "city": "Amman", "region": "", "postal": "", "country": "JO" },
+  "hours": [],
+  "services": ["Strength", "Cardio & conditioning", "Group classes", "Personal training"],
+  "about": "",
+  "reviews": [],
+  "colors": { "brand": "#e6b422", "accent": "#ff7a1a" },
+  "links": { "google": "", "instagram": "", "facebook": "", "order": "" },
+  "domain": ""
+}
