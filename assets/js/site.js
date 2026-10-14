@@ -1,12 +1,17 @@
-// APOLLO: fills the page from content.js and adds the small bits of motion. No frameworks.
+// APOLLO: fills the page from content.js and runs the motion (GSAP + ScrollTrigger + SplitText + Lenis, all vendored).
 (() => {
   const html = document.documentElement;
   const lang = html.lang === 'ar' ? 'ar' : 'en';
+  const rtl = html.dir === 'rtl';
   const T = TEXT[lang];
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
+  const motion = !calm && window.gsap;
+  const pad = (n) => String(n).padStart(2, '0');
+  const dir = rtl ? 1 : -1;
 
   // ---------- Words ----------
   $$('[data-t]').forEach((el) => { const v = T[el.dataset.t]; if (typeof v === 'string') el.textContent = v; });
@@ -16,100 +21,193 @@
     location.reload();
   });
 
-  // ---------- Links (WhatsApp, phone, Instagram, map) ----------
-  const wa = BUSINESS.whatsapp
-    ? `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(T.wa_msg)}` : '';
-  $$('.wa-link').forEach((a) => { if (wa) { a.href = wa; a.target = '_blank'; a.rel = 'noopener'; } else a.classList.add('is-placeholder'); });
-  $$('.tel-link').forEach((a) => { if (BUSINESS.phone) a.href = `tel:${BUSINESS.phone}`; else a.classList.add('is-placeholder'); });
-  $$('.ig-link').forEach((a) => { if (BUSINESS.instagram) a.href = BUSINESS.instagram; else a.classList.add('is-placeholder'); });
-  $$('.map-link').forEach((a) => { a.href = BUSINESS.maps; a.target = '_blank'; a.rel = 'noopener'; });
+  // ---------- Links ----------
+  const wa = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(T.wa_msg)}`;
+  $$('.wa-link').forEach((a) => { a.href = wa; a.target = '_blank'; a.rel = 'noopener'; });
+  $$('.tel-link').forEach((a) => { a.href = `tel:${BUSINESS.phone}`; });
+  $$('.ig-link').forEach((a) => { a.href = BUSINESS.instagram; });
+  $$('.map-link').forEach((a) => { a.href = BUSINESS.google; });
+  $('#google-link').href = BUSINESS.google;
+  $('#contact-lines').innerHTML = `<a href="tel:${esc(BUSINESS.phone)}" dir="ltr">${esc(BUSINESS.phoneDisplay)}</a> · <a href="https://wa.me/${esc(BUSINESS.whatsapp)}" dir="ltr">${esc(BUSINESS.mobileDisplay)}</a><br><a href="mailto:${esc(BUSINESS.email)}">${esc(BUSINESS.email)}</a>`;
   const map = $('#map');
   const loadMap = () => { if (map.src === 'about:blank') map.src = BUSINESS.mapEmbed; };
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { loadMap(); o.disconnect(); } }, { rootMargin: '400px' }).observe(map);
-  } else loadMap();
+  if ('IntersectionObserver' in window) new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { loadMap(); o.disconnect(); } }, { rootMargin: '600px' }).observe(map);
+  else loadMap();
 
   // ---------- Marquee ----------
   const words = T.marquee.map((w) => `<span>${esc(w)}</span><i>✦</i>`).join('');
   $('#marquee').innerHTML = words + words + words;
 
+  // ---------- Stats ----------
+  $('#stats-grid').innerHTML = T.stats.map((s) => `<div class="stat reveal"><b><span class="n" data-n="${s.n}" data-dec="${s.dec || 0}">${s.dec ? '0.0' : '0'}</span><span>${esc(s.suffix)}</span></b><p>${esc(s.label)}</p></div>`).join('');
+
+  // ---------- Tour ----------
+  $('#tour-track').innerHTML = SPACE.map((s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" alt="${esc(s[lang])}" loading="${i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`).join('');
+  $('#tour-total').textContent = pad(SPACE.length);
+
   // ---------- Programs ----------
-  const ICONS = {
-    bar: '<svg viewBox="0 0 24 24"><path d="M2 10v4M5 7v10M8 9v6M16 9v6M19 7v10M22 10v4M8 12h8"/></svg>',
-    pulse: '<svg viewBox="0 0 24 24"><path d="M2 12h4l3-7 4 14 3-9 2 2h4"/></svg>',
-    group: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3.5 2.5-6 6-6s6 2.5 6 6M10 20c0-3.5 2.5-6 6-6s6 2.5 6 6"/></svg>',
-    coach: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7M12 14v7"/></svg>'
-  };
-  $('#programs-grid').innerHTML = PROGRAMS.map((p, i) => {
+  $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
     const [name, text] = p[lang];
-    return `<article class="program reveal" style="--i:${i}"><span class="program-icon">${ICONS[p.icon]}</span><span class="program-num">0${i + 1}</span><h3>${esc(name)}</h3><p>${esc(text)}</p></article>`;
+    return `<div class="program reveal"><span class="program-num">${pad(i + 1)}</span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span class="program-thumb"><img src="${esc(p.img)}" alt="" loading="lazy"></span></div>`;
   }).join('');
+  $('#amenities').innerHTML = T.amenities.map((a) => `<li>${esc(a)}</li>`).join('');
 
-  // ---------- Space tiles ----------
-  $('#space-grid').innerHTML = SPACE.map((s, i) => {
-    const inner = s.img ? `<img src="${esc(s.img)}" alt="${esc(s[lang])}" loading="lazy">` : '<span class="tile-ph" aria-hidden="true"></span>';
-    return `<figure class="tile reveal" style="--i:${i}">${inner}<figcaption>${esc(s[lang])}</figcaption></figure>`;
+  // ---------- Ethos ----------
+  $('#ethos-stack').innerHTML = ETHOS.map((e, i) => {
+    const [a, b, text] = e[lang];
+    return `<article class="ethos-card"><span class="ethos-num">${pad(i + 1)}</span><h3>${esc(a)}<em>${esc(b)}</em></h3><p>${esc(text)}</p></article>`;
   }).join('');
+  $('#values').innerHTML = T.values.map((v) => `<span>${esc(v)}</span>`).join('');
 
-  // ---------- Coaches ----------
-  $('#coaches-grid').innerHTML = COACHES.map((c, i) => {
-    const [name, role] = c[lang];
-    const photo = c.img ? `<img src="${esc(c.img)}" alt="${esc(name)}" loading="lazy">` : '<span class="coach-ph" aria-hidden="true"></span>';
-    return `<article class="coach reveal" style="--i:${i}"><div class="coach-photo">${photo}</div><h3>${esc(name)}</h3><p>${esc(role)}</p></article>`;
-  }).join('');
+  // ---------- Story ----------
+  $('#timeline').insertAdjacentHTML('beforeend', STORY.map((s) => {
+    const [title, text] = s[lang];
+    return `<div class="milestone reveal"><b>${esc(s.y)}</b><h3>${esc(title)}</h3><p>${esc(text)}</p></div>`;
+  }).join(''));
+
+  // ---------- Quotes ----------
+  $('#quotes').innerHTML = QUOTES.map((q) => `<blockquote class="quote reveal"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`).join('');
 
   // ---------- Plans ----------
-  $('#plans-grid').innerHTML = PLANS.map((p, i) => {
+  $('#plans-grid').innerHTML = PLANS.map((p) => {
     const [name, perks] = p[lang];
-    const price = p.price ? `<b>${esc(p.price)}</b><small>${esc(T.jd)} ${esc(T.per_month)}</small>` : '<b class="ph">--</b><small>&nbsp;</small>';
-    return `<article class="plan reveal${p.popular ? ' is-popular' : ''}" style="--i:${i}">${p.popular ? `<span class="plan-tag">${esc(T.popular)}</span>` : ''}<h3>${esc(name)}</h3><div class="plan-price">${price}</div><ul>${perks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><a class="btn btn-ghost wa-link" href="${wa || '#visit'}"${wa ? ' target="_blank" rel="noopener"' : ''}>${esc(T.plan_cta)}</a></article>`;
+    return `<article class="plan reveal${p.popular ? ' is-popular' : ''}">${p.popular ? `<span class="plan-tag">${esc(T.popular)}</span>` : ''}<h3>${esc(name)}</h3><div class="plan-price"><b>${p.price}</b><small>${esc(T.jd)}</small></div><ul>${perks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><a class="btn btn-ghost" href="${wa}" target="_blank" rel="noopener">${esc(T.plan_cta)}</a></article>`;
   }).join('');
 
-  // ---------- Schedule ----------
+  // ---------- Hours + open badge ----------
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: BUSINESS.timezone }));
   const today = now.getDay();
-  const dayBtns = T.days.map((d, i) => `<button type="button" role="tab" aria-selected="${i === today}" data-day="${i}">${esc(d)}</button>`).join('');
-  $('#days').innerHTML = dayBtns;
-  const showDay = (d) => {
-    $$('#days button').forEach((b) => b.setAttribute('aria-selected', String(+b.dataset.day === d)));
-    const rows = SCHEDULE[d] || [];
-    $('#classes').innerHTML = rows.length
-      ? rows.map((r) => `<div class="class-row"><time dir="ltr">${esc(r[0])}</time><span>${esc(lang === 'ar' ? r[2] : r[1])}</span></div>`).join('')
-      : `<p class="class-empty">${lang === 'ar' ? 'لا توجد حصص جماعية هذا اليوم. الصالة مفتوحة للتمرين الحر.' : 'No group classes today. The floor is open for training.'}</p>`;
-  };
-  $('#days').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showDay(+b.dataset.day); });
-  showDay(today);
-
-  // ---------- Hours table + open badge ----------
   const fmt = (s) => {
     let [h, m] = s.split(':').map(Number); h %= 24;
-    if (lang === 'ar') return `${h}:${String(m).padStart(2, '0')}`;
-    return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+    if (lang === 'ar') return `${h}:${pad(m)}`;
+    return `${h % 12 || 12}:${pad(m)} ${h < 12 ? 'AM' : 'PM'}`;
   };
-  $('#hours').innerHTML = HOURS.map((h, i) => `<tr${i === today ? ' class="is-today"' : ''}><th>${esc(T.days[i])}</th><td dir="ltr">${h ? `${fmt(h[0])} – ${fmt(h[1])}` : (lang === 'ar' ? 'مغلق' : 'Closed')}</td></tr>`).join('');
+  $('#hours').innerHTML = BUSINESS.hours.map((h, i) => `<tr${i === today ? ' class="is-today"' : ''}><th data-today="${esc(T.today)}">${esc(T.days[i])}</th><td dir="ltr">${h ? `${fmt(h[0])} – ${fmt(h[1])}` : (lang === 'ar' ? 'مغلق' : 'Closed')}</td></tr>`).join('');
   (function openBadge() {
     const el = $('#open');
     const m = now.getHours() * 60 + now.getMinutes();
     const toMin = (s) => { const [h, mm] = s.split(':').map(Number); return h * 60 + mm; };
-    const t = HOURS[today], y = HOURS[(today + 6) % 7];
-    let open = false;
-    if (y && m < toMin(y[1]) - 1440) open = true;
-    if (t && m >= toMin(t[0]) && m < toMin(t[1])) open = true;
-    el.classList.toggle('is-open', open);
-    $('span', el).textContent = open ? T.open_now : T.closed_now;
+    const t = BUSINESS.hours[today];
+    const open = t && m >= toMin(t[0]) && m < toMin(t[1]);
+    el.classList.toggle('is-open', !!open);
+    $('span', el).textContent = open ? `${T.open_now} · ${T.closes} ${fmt(t[1])}` : `${T.closed_now} · ${T.opens} ${fmt((BUSINESS.hours[t && m < toMin(t[0]) ? today : (today + 1) % 7] || ['06:00'])[0])}`;
   })();
 
-  // ---------- Reveal on scroll ----------
-  const reveals = $$('.reveal');
-  if (calm || !('IntersectionObserver' in window)) reveals.forEach((el) => el.classList.add('in'));
-  else {
-    const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.15 });
-    reveals.forEach((el) => io.observe(el));
-  }
-  requestAnimationFrame(() => html.classList.add('ready'));
+  // ---------- Phone menu ----------
+  const overlay = $('#overlay'), openBtn = $('#menu-open');
+  let lenis = null;
+  const setMenu = (show) => {
+    openBtn.setAttribute('aria-expanded', String(show));
+    overlay.hidden = !show;
+    if (lenis) show ? lenis.stop() : lenis.start();
+    if (motion && show) gsap.fromTo($$('.overlay-nav a, .overlay-cta'), { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: .6, stagger: .06, ease: 'power3.out' });
+  };
+  openBtn.addEventListener('click', () => setMenu(overlay.hidden));
+  $('#menu-close').addEventListener('click', () => setMenu(false));
+  $$('.overlay a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
   // ---------- Header shadow ----------
   const header = $('.site-header');
-  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 10);
+  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // ---------- No motion: show everything and stop ----------
+  if (!motion) {
+    $$('.reveal, .hero-foot > *, .scroll-cue').forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
+    $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; });
+    $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
+    $('#loader').remove();
+    $('#tour-bar').style.transform = 'none';
+    $('#timeline-fill').style.transform = 'none';
+    return;
+  }
+
+  // ---------- Motion setup ----------
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+  lenis = new Lenis({ lerp: .09, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  lenis.stop();
+  $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
+    const target = a.getAttribute('href') === '#top' ? 0 : $(a.getAttribute('href'));
+    if (target === 0 || target) { e.preventDefault(); lenis.scrollTo(target, { offset: -60, duration: 1.4 }); }
+  }));
+
+  // Heading splits (lines slide up when they come into view)
+  const splits = $$('.split').map((el) => SplitText.create(el, { type: 'lines', linesClass: 'line' }));
+  splits.forEach((s) => {
+    const inner = s.lines.map((line) => { const span = document.createElement('span'); span.style.display = 'block'; span.innerHTML = line.innerHTML; line.innerHTML = ''; line.appendChild(span); return span; });
+    gsap.from(inner, { yPercent: 110, duration: 1, ease: 'power4.out', stagger: .08, scrollTrigger: { trigger: s.elements[0], start: 'top 85%' } });
+  });
+  $$('.reveal').forEach((el, i) => {
+    gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+  });
+
+  // ---------- Intro: the neon sign flickers on ----------
+  const loader = $('#loader'), mark = $('.loader-mark');
+  const intro = gsap.timeline({ onComplete: () => { loader.remove(); lenis.start(); ScrollTrigger.refresh(); } });
+  const flick = [0, 1, .1, .8, .05, 1, .2, 1, 1, .1, 1];
+  flick.forEach((o, i) => intro.set(mark, { opacity: o }, .3 + i * .07));
+  intro.add(() => mark.classList.add('lit'), 1.1)
+    .set(mark, { opacity: 1 }, 1.1)
+    .to('.loader-word span', { opacity: 1, y: 0, duration: .6, stagger: .05, ease: 'power3.out' }, 1.0)
+    .to('.loader-tag', { opacity: 1, duration: .5 }, 1.5)
+    .to('.loader-bar i', { scaleX: 1, duration: 1.6, ease: 'power2.inOut' }, .3)
+    .to('.loader-inner', { scale: .9, opacity: 0, duration: .5, ease: 'power2.in' }, 2.15)
+    .to(loader, { yPercent: -100, duration: .9, ease: 'expo.inOut' }, 2.3)
+    .from('.hero-photo', { scale: 1.15, duration: 1.8, ease: 'power3.out' }, 2.5)
+    .to('.display .line > span', { y: 0, duration: 1.1, ease: 'power4.out', stagger: .1 }, 2.6)
+    .to('.hero-foot > *', { opacity: 1, duration: .9, stagger: .1, ease: 'power2.out' }, 3.0)
+    .to('.scroll-cue', { opacity: 1, duration: .8 }, 3.3);
+
+  // ---------- Hero: the sun rises, the photo drifts ----------
+  gsap.to('#sun', { yPercent: -45, scale: 1.25, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('.hero-photo', { yPercent: 12, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('.hero-word', { yPercent: 40, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('.final-sun', { yPercent: -25, scale: 1.15, ease: 'none', scrollTrigger: { trigger: '#final', start: 'top bottom', end: 'bottom top', scrub: true } });
+
+  // ---------- Stats count up ----------
+  $$('.n').forEach((el) => {
+    const n = +el.dataset.n, dec = +el.dataset.dec, o = { v: 0 };
+    gsap.to(o, { v: n, duration: 1.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' }, onUpdate: () => { el.textContent = o.v.toFixed(dec); } });
+  });
+
+  // ---------- Tour: pinned horizontal scroll on desktop, native swipe on phones ----------
+  const track = $('#tour-track'), viewport = $('#tour-viewport'), bar = $('#tour-bar'), idx = $('#tour-index');
+  const setProgress = (p) => { bar.style.transform = `scaleX(${p})`; idx.textContent = pad(Math.min(SPACE.length, Math.round(p * (SPACE.length - 1)) + 1)); };
+  ScrollTrigger.matchMedia({
+    '(min-width: 721px)': () => {
+      const dist = () => track.scrollWidth - viewport.clientWidth;
+      gsap.to(track, { x: () => dir * dist(), ease: 'none', scrollTrigger: { trigger: '#space', start: 'top top+=10', end: () => '+=' + Math.round(dist() * .6), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1, onUpdate: (st) => setProgress(st.progress) } });
+      $$('.tour-item img').forEach((img) => gsap.fromTo(img, { xPercent: dir * -6 }, { xPercent: dir * 6, ease: 'none', scrollTrigger: { trigger: '#space', start: 'top top+=10', end: () => '+=' + Math.round(dist() * .6), scrub: true } }));
+    },
+    '(max-width: 720px)': () => {
+      const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; setProgress(max ? Math.abs(viewport.scrollLeft) / max : 0); };
+      viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
+    }
+  });
+
+  // ---------- Program hover thumbnail follows the mouse ----------
+  if (window.matchMedia('(hover: hover)').matches) {
+    $$('.program').forEach((row) => {
+      const thumb = $('.program-thumb', row);
+      row.addEventListener('mousemove', (e) => { const r = row.getBoundingClientRect(); gsap.to(thumb, { left: e.clientX - r.left - 150, duration: .5, ease: 'power3.out' }); });
+    });
+  }
+
+  // ---------- Timeline line draws in ----------
+  gsap.to('#timeline-fill', { scaleX: 1, scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#timeline', start: 'top 80%', end: 'bottom 60%', scrub: true } });
+
+  // ---------- Ethos cards shrink as the next one covers them ----------
+  $$('.ethos-card').forEach((card, i, all) => {
+    if (i === all.length - 1) return;
+    gsap.to(card, { scale: .94, opacity: .5, ease: 'none', scrollTrigger: { trigger: all[i + 1], start: 'top 80%', end: 'top 20%', scrub: true } });
+  });
+
+  // ---------- Marquee speeds up with scroll velocity ----------
+  const mq = $('#marquee');
+  ScrollTrigger.create({ onUpdate: (st) => { const v = Math.min(4, 1 + Math.abs(st.getVelocity()) / 600); mq.style.animationDuration = `${40 / v}s`; } });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
 })();

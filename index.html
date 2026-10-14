@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apollo | Gym in Amman, Jordan</title>
-  <meta name="description" content="Apollo gym in Amman: strength, conditioning, group classes and personal training. Message us on WhatsApp to start.">
-  <meta property="og:title" content="Apollo | Gym in Amman">
-  <meta property="og:description" content="Strength, conditioning, classes and coaching in Amman, Jordan.">
-  <meta name="theme-color" content="#0b0b0d">
+  <title>Apollo Training Facility | Gym on Mecca Street, Amman</title>
+  <meta name="description" content="Apollo Training Facility: Amman's community gym on Mecca Street. 840 m² of strength, conditioning, boxing and classes, open from 6 AM. Book your tour on WhatsApp.">
+  <meta property="og:title" content="Apollo Training Facility | Amman">
+  <meta property="og:description" content="Rule your destiny. Defy the limits. 840 m² of training floor on Mecca Street, open from 6 AM.">
+  <meta property="og:image" content="assets/img/space/free-weights.webp">
+  <meta name="theme-color" content="#0a0a0b">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/montserrat-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/site.css">
   <!-- Remembers the visitor's language before the page paints, so there is no flash. -->
   <script>
@@ -16,150 +18,225 @@
       var l = null; try { l = localStorage.getItem('apollo-lang'); } catch (e) {}
       if (!l && /^ar\b/i.test(navigator.language || '')) l = 'ar';
       if (l === 'ar') { document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }
+      document.documentElement.classList.add('js');
     })();
   </script>
-  <!-- Facts for Google search results. PLACEHOLDER values are filled once Apollo confirms them. -->
+  <!-- Facts for Google search results. Keep in sync with content.js. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "ExerciseGym",
-    "name": "Apollo",
-    "address": { "@type": "PostalAddress", "addressLocality": "Amman", "addressCountry": "JO" }
+    "name": "Apollo Training Facility",
+    "telephone": "+962-6-586-1393",
+    "email": "info@apollotf.com",
+    "url": "https://www.apollotrainingfacility.com/",
+    "sameAs": ["https://www.instagram.com/apollogym.jo/", "https://www.facebook.com/atf.jo/"],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Mecca Street, Al Sayegh Commercial Complex #181",
+      "addressLocality": "Amman",
+      "addressCountry": "JO"
+    },
+    "openingHours": ["Sa-Th 06:00-23:30", "Fr 11:00-19:00"]
   }
   </script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  <!-- Logo, drawn once and reused. PLACEHOLDER: a recreation of Apollo's mark until they send the original file. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="mark" viewBox="0 0 100 100">
+      <path fill-rule="evenodd" d="M50 3 L97 97 H3 Z M50 31 L76 97 H24 Z"/>
+      <path d="M50 64 L63 97 H37 Z"/>
+    </symbol>
+  </svg>
+
+  <!-- Intro: the neon sign flickers on -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <svg class="loader-mark" viewBox="0 0 100 100"><use href="#mark"/></svg>
+      <div class="loader-word" aria-hidden="true"><span>A</span><span>P</span><span>O</span><span>L</span><span>L</span><span>O</span></div>
+      <p class="loader-tag" data-t="loader_tag"></p>
+    </div>
+    <div class="loader-bar"><i></i></div>
+  </div>
+
   <header class="site-header" id="top">
     <div class="wrap header-row">
-      <a class="logo" href="#top" aria-label="Apollo home">
-        <!-- PLACEHOLDER logo mark: replace with Apollo's real logo in assets/img/ -->
-        <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M20 8 L28 30 H24.5 L20 18 L15.5 30 H12 Z" fill="currentColor"/></svg>
-        <span>APOLLO</span>
+      <a class="logo" href="#top" aria-label="Apollo Training Facility, home">
+        <svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
+        <span class="logo-word">APOLLO<small>Training Facility</small></span>
       </a>
       <nav class="nav" aria-label="Main">
+        <a href="#space" data-t="nav_space"></a>
         <a href="#programs" data-t="nav_programs"></a>
-        <a href="#coaches" data-t="nav_coaches"></a>
-        <a href="#membership" data-t="nav_membership"></a>
-        <a href="#schedule" data-t="nav_schedule"></a>
+        <a href="#story" data-t="nav_story"></a>
+        <a href="#plans" data-t="nav_plans"></a>
         <a href="#visit" data-t="nav_visit"></a>
       </nav>
       <div class="header-actions">
         <button id="lang" class="lang" type="button" data-t="lang_btn"></button>
-        <a class="btn btn-small wa-link" href="#visit" data-t="wa_short"></a>
+        <a class="btn btn-small wa-link" href="#visit" data-t="nav_cta"></a>
+        <button id="menu-open" class="burger" type="button" aria-expanded="false" aria-controls="overlay"><span></span><span></span><span data-t="menu" class="sr"></span></button>
       </div>
     </div>
   </header>
 
+  <!-- Phone menu -->
+  <div class="overlay" id="overlay" hidden>
+    <button id="menu-close" class="overlay-close" type="button" data-t="close"></button>
+    <nav class="overlay-nav" aria-label="Phone menu">
+      <a href="#space" data-t="nav_space"></a>
+      <a href="#programs" data-t="nav_programs"></a>
+      <a href="#story" data-t="nav_story"></a>
+      <a href="#members" data-t="nav_members"></a>
+      <a href="#plans" data-t="nav_plans"></a>
+      <a href="#visit" data-t="nav_visit"></a>
+    </nav>
+    <a class="btn btn-big wa-link overlay-cta" href="#visit" data-t="cta_tour"></a>
+  </div>
+
   <main id="main">
-    <!-- HERO -->
-    <section class="hero">
+    <!-- HERO: the sun rises as you scroll -->
+    <section class="hero" id="hero">
       <div class="hero-bg" aria-hidden="true">
-        <div class="sun"></div>
-        <div class="grid-lines"></div>
+        <!-- PLACEHOLDER image: frame from Apollo's own Instagram gym guide -->
+        <img class="hero-photo" src="assets/img/space/cardio.webp" alt="" fetchpriority="high">
+        <div class="hero-shade"></div>
+        <div class="sun" id="sun"></div>
+        <div class="hero-grain"></div>
       </div>
       <div class="wrap hero-inner">
-        <p class="eyebrow" data-t="hero_eyebrow"></p>
+        <p class="eyebrow hero-eyebrow" data-t="hero_eyebrow"></p>
         <h1 class="display">
-          <span class="line"><span data-t="hero_l1"></span></span>
-          <span class="line"><span data-t="hero_l2"></span></span>
-          <span class="line line-accent"><span data-t="hero_l3"></span></span>
+          <span class="line"><span><span data-t="hero_l1"></span> <em data-t="hero_l2"></em></span></span>
+          <span class="line"><span><span data-t="hero_l3"></span> <em data-t="hero_l4"></em></span></span>
         </h1>
-        <p class="hero-sub" data-t="hero_sub"></p>
-        <div class="hero-actions">
-          <a class="btn wa-link" href="#visit" data-t="cta_wa"></a>
-          <a class="btn btn-ghost map-link" href="#visit" data-t="cta_map"></a>
-        </div>
-        <div class="hero-meta">
+        <div class="hero-foot">
+          <p class="hero-sub" data-t="hero_sub"></p>
+          <div class="hero-actions">
+            <a class="btn wa-link" href="#visit"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 0 1 12 4Zm-3 4.5c-.2 0-.5 0-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.3l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.9-2c-.2-.6-.5-.5-.6-.5h-.5Z"/></svg><span data-t="cta_tour"></span></a>
+            <a class="btn btn-ghost" href="#space" data-t="cta_space"></a>
+          </div>
           <span id="open" class="open-badge"><i></i><span></span></span>
         </div>
       </div>
-      <a class="scroll-cue" href="#programs"><span data-t="scroll"></span><i></i></a>
+      <a class="scroll-cue" href="#stats"><span data-t="scroll"></span><i></i></a>
+      <div class="hero-word" aria-hidden="true">APOLLO</div>
     </section>
 
     <!-- MARQUEE -->
     <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
 
+    <!-- STATS -->
+    <section class="stats" id="stats">
+      <div class="wrap stats-grid" id="stats-grid"></div>
+    </section>
+
+    <!-- THE SPACE: horizontal tour -->
+    <section class="tour" id="space">
+      <div class="tour-head wrap">
+        <p class="kicker" data-t="space_kicker"></p>
+        <h2 class="split" data-t="space_title"></h2>
+        <p class="lead" data-t="space_text"></p>
+        <p class="tour-hint" data-t="space_hint"></p>
+      </div>
+      <div class="tour-viewport" id="tour-viewport">
+        <div class="tour-track" id="tour-track"></div>
+      </div>
+      <div class="tour-progress wrap"><span id="tour-index">01</span><i><b id="tour-bar"></b></i><span id="tour-total"></span></div>
+    </section>
+
     <!-- PROGRAMS -->
-    <section id="programs" class="section">
+    <section class="section programs-section" id="programs">
       <div class="wrap">
         <p class="kicker reveal" data-t="programs_kicker"></p>
-        <h2 class="reveal" data-t="programs_title"></h2>
-        <div class="programs" id="programs-grid"></div>
+        <h2 class="split" data-t="programs_title"></h2>
+        <p class="lead reveal" data-t="programs_text"></p>
+        <div class="programs" id="programs-list"></div>
+        <ul class="amenities reveal" id="amenities"></ul>
       </div>
     </section>
 
-    <!-- SPACE / PHOTOS -->
-    <section id="space" class="section section-dark">
+    <!-- ETHOS: stacked cards -->
+    <section class="section ethos-section" id="ethos">
       <div class="wrap">
-        <p class="kicker reveal" data-t="space_kicker"></p>
-        <h2 class="reveal" data-t="space_title"></h2>
-        <p class="lead reveal" data-t="space_text"></p>
-        <!-- PLACEHOLDER image tiles until Apollo sends photos -->
-        <div class="tiles" id="space-grid"></div>
+        <p class="kicker reveal" data-t="ethos_kicker"></p>
+        <h2 class="split" data-t="ethos_title"></h2>
+        <p class="lead reveal" data-t="ethos_text"></p>
+        <div class="ethos-stack" id="ethos-stack"></div>
+        <div class="values reveal">
+          <p class="values-title" data-t="values_title"></p>
+          <div class="values-row" id="values"></div>
+        </div>
       </div>
     </section>
 
-    <!-- COACHES -->
-    <section id="coaches" class="section">
+    <!-- STORY -->
+    <section class="section story-section" id="story">
       <div class="wrap">
-        <p class="kicker reveal" data-t="coaches_kicker"></p>
-        <h2 class="reveal" data-t="coaches_title"></h2>
-        <p class="lead reveal" data-t="coaches_text"></p>
-        <div class="coaches" id="coaches-grid"></div>
+        <p class="kicker reveal" data-t="story_kicker"></p>
+        <h2 class="split" data-t="story_title"></h2>
+        <div class="timeline" id="timeline"><i class="timeline-line"><b id="timeline-fill"></b></i></div>
       </div>
     </section>
 
-    <!-- MEMBERSHIP -->
-    <section id="membership" class="section section-dark">
+    <!-- MEMBERS -->
+    <section class="section members-section" id="members">
       <div class="wrap">
-        <p class="kicker reveal" data-t="membership_kicker"></p>
-        <h2 class="reveal" data-t="membership_title"></h2>
-        <p class="lead reveal" data-t="membership_text"></p>
+        <p class="kicker reveal" data-t="members_kicker"></p>
+        <h2 class="split" data-t="members_title"></h2>
+        <div class="quotes" id="quotes"></div>
+        <a class="google-badge reveal" id="google-link" href="#" target="_blank" rel="noopener"><b>★★★★★</b><span data-t="google_badge"></span></a>
+      </div>
+    </section>
+
+    <!-- PLANS -->
+    <section class="section plans-section" id="plans">
+      <div class="wrap">
+        <p class="kicker reveal" data-t="plans_kicker"></p>
+        <h2 class="split" data-t="plans_title"></h2>
+        <p class="lead reveal" data-t="plans_text"></p>
         <div class="plans" id="plans-grid"></div>
-      </div>
-    </section>
-
-    <!-- SCHEDULE -->
-    <section id="schedule" class="section">
-      <div class="wrap">
-        <p class="kicker reveal" data-t="schedule_kicker"></p>
-        <h2 class="reveal" data-t="schedule_title"></h2>
-        <div class="days reveal" id="days" role="tablist"></div>
-        <div class="classes" id="classes"></div>
+        <div class="referral reveal">
+          <svg class="referral-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
+          <div><h3 data-t="referral_title"></h3><p data-t="referral_text"></p></div>
+        </div>
       </div>
     </section>
 
     <!-- VISIT -->
-    <section id="visit" class="section section-dark">
+    <section class="section visit-section" id="visit">
       <div class="wrap">
         <p class="kicker reveal" data-t="visit_kicker"></p>
-        <h2 class="reveal" data-t="visit_title"></h2>
+        <h2 class="split" data-t="visit_title"></h2>
         <div class="visit-grid">
           <div class="visit-info reveal">
             <h3 data-t="hours_title"></h3>
             <table class="hours" id="hours"></table>
             <h3 data-t="contact_title"></h3>
             <div class="contact-links">
-              <a class="btn wa-link" href="#" data-t="cta_wa"></a>
+              <a class="btn wa-link" href="#" data-t="whatsapp"></a>
               <a class="btn btn-ghost tel-link" href="#" data-t="call"></a>
               <a class="btn btn-ghost ig-link" href="#" data-t="instagram" target="_blank" rel="noopener"></a>
             </div>
+            <p class="contact-lines" id="contact-lines"></p>
             <h3 data-t="address_title"></h3>
             <p class="address" data-t="address"></p>
-            <a class="map-link text-link" href="#" data-t="cta_map"></a>
+            <a class="map-link text-link" href="#" data-t="directions" target="_blank" rel="noopener"></a>
           </div>
-          <!-- PLACEHOLDER map: centred on Amman until Apollo shares its pin -->
-          <iframe class="map reveal" id="map" title="Map to Apollo" loading="lazy" src="about:blank"></iframe>
+          <iframe class="map reveal" id="map" title="Map to Apollo Training Facility" loading="lazy" src="about:blank"></iframe>
         </div>
       </div>
     </section>
 
-    <!-- FINAL CTA -->
-    <section class="final">
-      <div class="wrap">
-        <h2 class="display-sm reveal" data-t="final_title"></h2>
+    <!-- FINAL -->
+    <section class="final" id="final">
+      <div class="final-sun" aria-hidden="true"></div>
+      <div class="wrap final-inner">
+        <p class="final-word split" data-t="final_word"></p>
+        <h2 class="final-title reveal" data-t="final_title"></h2>
         <a class="btn btn-big wa-link reveal" href="#visit" data-t="final_cta"></a>
       </div>
     </section>
@@ -167,14 +244,19 @@
 
   <footer class="site-footer">
     <div class="wrap footer-row">
-      <p>&copy; <span id="year">2026</span> <span data-t="footer"></span></p>
-      <a href="#top" class="text-link">&uarr;</a>
+      <div class="footer-brand"><svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg><span data-t="footer_name"></span></div>
+      <p>&copy; <span id="year">2026</span> <span data-t="footer_name"></span> &middot; <span data-t="footer_addr"></span></p>
+      <p class="footer-credit" data-t="footer_credit"></p>
     </div>
   </footer>
 
   <!-- Sticky WhatsApp bar on phones -->
-  <a class="call-bar wa-link" href="#visit" data-t="cta_wa"></a>
+  <a class="call-bar wa-link" href="#visit" data-t="cta_tour"></a>
 
+  <script src="assets/js/vendor/gsap.min.js"></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/js/vendor/SplitText.min.js"></script>
+  <script src="assets/js/vendor/lenis.min.js"></script>
   <script src="assets/js/content.js"></script>
   <script src="assets/js/site.js"></script>
 </body>
