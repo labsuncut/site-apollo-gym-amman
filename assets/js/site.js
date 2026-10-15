@@ -26,6 +26,7 @@
   $$('.wa-link').forEach((a) => { a.href = wa; a.target = '_blank'; a.rel = 'noopener'; });
   $$('.tel-link').forEach((a) => { a.href = `tel:${BUSINESS.phone}`; });
   $$('.ig-link').forEach((a) => { a.href = BUSINESS.instagram; });
+  $$('.mail-link').forEach((a) => { a.href = `mailto:${BUSINESS.email}`; });
   $$('.map-link').forEach((a) => { a.href = BUSINESS.google; });
   $('#google-link').href = BUSINESS.google;
   $('#contact-lines').innerHTML = `<a href="tel:${esc(BUSINESS.phone)}" dir="ltr">${esc(BUSINESS.phoneDisplay)}</a> · <a href="https://wa.me/${esc(BUSINESS.whatsapp)}" dir="ltr">${esc(BUSINESS.mobileDisplay)}</a><br><a href="mailto:${esc(BUSINESS.email)}">${esc(BUSINESS.email)}</a>`;
@@ -69,6 +70,7 @@
   $('#quotes').innerHTML = QUOTES.map((q) => `<blockquote class="quote reveal"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`).join('');
 
   // ---------- Plans ----------
+  $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
   $('#plans-grid').innerHTML = PLANS.map((p) => {
     const [name, perks] = p[lang];
     return `<article class="plan reveal${p.popular ? ' is-popular' : ''}">${p.popular ? `<span class="plan-tag">${esc(T.popular)}</span>` : ''}<h3>${esc(name)}</h3><div class="plan-price"><b>${p.price}</b><small>${esc(T.jd)}</small></div><ul>${perks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><a class="btn btn-ghost" href="${wa}" target="_blank" rel="noopener">${esc(T.plan_cta)}</a></article>`;
@@ -144,22 +146,54 @@
     gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
 
-  // ---------- Intro: the neon sign flickers on ----------
-  const loader = $('#loader'), mark = $('.loader-mark');
+  // ---------- Intro: you walk into the facility ----------
+  // The doors part on a red seam, the mark drops out of the dark and lands on the stone,
+  // the sign flickers on, then the camera pushes through into the hero. About 2.8s.
+  // Any tap, click, key or scroll fast-forwards it; after the first play in this tab it runs
+  // at triple speed so switching language or reloading never makes anyone sit through it.
+  const loader = $('#loader'), mark = $('.loader-mark'), scene = $('.loader-scene');
+  let seen = false;
+  try { seen = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
+  const dust = $('#dust');
+  for (let i = 0; i < 16; i++) dust.appendChild(document.createElement('i'));
   const intro = gsap.timeline({ onComplete: () => { loader.remove(); lenis.start(); ScrollTrigger.refresh(); } });
-  const flick = [0, 1, .1, .8, .05, 1, .2, 1, 1, .1, 1];
-  flick.forEach((o, i) => intro.set(mark, { opacity: o }, .3 + i * .07));
-  intro.add(() => mark.classList.add('lit'), 1.1)
-    .set(mark, { opacity: 1 }, 1.1)
-    .to('.loader-word span', { opacity: 1, y: 0, duration: .6, stagger: .05, ease: 'power3.out' }, 1.0)
-    .to('.loader-tag', { opacity: 1, duration: .5 }, 1.5)
-    .to('.loader-bar i', { scaleX: 1, duration: 1.6, ease: 'power2.inOut' }, .3)
-    .to('.loader-inner', { scale: .9, opacity: 0, duration: .5, ease: 'power2.in' }, 2.15)
-    .to(loader, { yPercent: -100, duration: .9, ease: 'expo.inOut' }, 2.3)
-    .from('.hero-photo', { scale: 1.15, duration: 1.8, ease: 'power3.out' }, 2.5)
-    .to('.display .line > span', { y: 0, duration: 1.1, ease: 'power4.out', stagger: .1 }, 2.6)
-    .to('.hero-foot > *', { opacity: 1, duration: .9, stagger: .1, ease: 'power2.out' }, 3.0)
-    .to('.scroll-cue', { opacity: 1, duration: .8 }, 3.3);
+  const flick = [1, .15, 1, .1, .9, .2, 1];
+  intro
+    .set(mark, { yPercent: -260, opacity: 1, filter: 'brightness(.35)' })
+    .to('.seam', { opacity: 1, scaleY: 1, duration: .45, ease: 'power2.out' }, .1)
+    .to('.door-l', { xPercent: -100, duration: .9, ease: 'expo.inOut' }, .5)
+    .to('.door-r', { xPercent: 100, duration: .9, ease: 'expo.inOut' }, .5)
+    .to('.seam', { opacity: 0, duration: .3 }, .55)
+    .to(['.temple', '.shaft', '.spot'], { opacity: 1, duration: .9, ease: 'power2.out' }, .6)
+    .to(mark, { yPercent: 0, duration: .5, ease: 'power3.in' }, .95)
+    // impact
+    .to(mark, { scaleY: .86, scaleX: 1.08, duration: .08, ease: 'power1.out' }, 1.45)
+    .to(mark, { scaleY: 1, scaleX: 1, duration: .25, ease: 'elastic.out(1, .5)' }, 1.53)
+    .fromTo(scene, { x: 0 }, { x: 7, duration: .05, repeat: 5, yoyo: true, ease: 'none' }, 1.45)
+    .set(scene, { x: 0 }, 1.78)
+    .to('.plinth-glow', { opacity: 1, duration: .08 }, 1.45)
+    .to('.plinth-glow', { opacity: .45, duration: .6 }, 1.55)
+    .fromTo('.dust i', { x: 0, y: 0, opacity: 1 }, { x: () => gsap.utils.random(-140, 140), y: () => gsap.utils.random(-90, -16), opacity: 0, duration: .75, ease: 'power3.out', stagger: .006 }, 1.45);
+  flick.forEach((o, i) => intro.set(mark, { filter: 'brightness(' + o + ')' }, 1.5 + i * .06));
+  intro.add(() => mark.classList.add('lit'), 1.92)
+    .set(mark, { filter: 'brightness(1)' }, 1.92)
+    .to('.loader-word span', { opacity: 1, scale: 1, duration: .45, stagger: .035, ease: 'power3.out' }, 1.6)
+    .to('.loader-tag', { opacity: 1, duration: .4 }, 1.95)
+    .to('.loader-bar i', { scaleX: 1, duration: 2.1, ease: 'power2.inOut' }, .3)
+    // walk in: the camera pushes past the sign into the gym
+    .to(scene, { scale: 2.2, opacity: 0, duration: .7, ease: 'power3.in' }, 2.35)
+    .to(loader, { opacity: 0, duration: .5, ease: 'power2.in' }, 2.6)
+    .from('.hero-photo', { scale: 1.2, duration: 1.6, ease: 'power3.out' }, 2.6)
+    .to('.display .line > span', { y: 0, duration: 1, ease: 'power4.out', stagger: .09 }, 2.75)
+    .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, 3.1)
+    .to('.scroll-cue', { opacity: 1, duration: .7 }, 3.4);
+  if (seen) intro.timeScale(3);
+  window.apolloIntro = intro;
+  const skipIntro = () => { if (intro.progress() < 1 && intro.timeScale() < 6) intro.timeScale(6); };
+  loader.addEventListener('click', skipIntro);
+  loader.addEventListener('touchstart', skipIntro, { passive: true });
+  addEventListener('keydown', skipIntro, { once: true });
+  addEventListener('wheel', skipIntro, { passive: true, once: true });
 
   // ---------- Hero: the sun rises, the photo drifts ----------
   gsap.to('#sun', { yPercent: -45, scale: 1.25, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });

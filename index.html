@@ -47,18 +47,28 @@
   <!-- Logo, drawn once and reused. PLACEHOLDER: a recreation of Apollo's mark until they send the original file. -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="mark" viewBox="0 0 100 100">
-      <path fill-rule="evenodd" d="M50 3 L97 97 H3 Z M50 31 L76 97 H24 Z"/>
-      <path d="M50 64 L63 97 H37 Z"/>
+      <path d="M42 3 L3 97 H44 L28 76 L50 22 L72 76 L56 97 H97 L58 3 Z"/>
     </symbol>
   </svg>
 
-  <!-- Intro: the neon sign flickers on -->
+  <!-- Intro: the doors open, the mark lands on the stone, the sign flickers on -->
   <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader-inner">
-      <svg class="loader-mark" viewBox="0 0 100 100"><use href="#mark"/></svg>
+    <div class="loader-scene">
+      <div class="temple"><i class="column column-l"></i><i class="column column-r"></i></div>
+      <div class="shaft"></div>
+      <div class="spot"></div>
+      <div class="altar">
+        <svg class="loader-mark" viewBox="0 0 100 100"><use href="#mark"/></svg>
+        <div class="dust" id="dust"></div>
+        <div class="plinth"><i class="plinth-top"></i><i class="plinth-face"></i><i class="plinth-glow"></i></div>
+        <div class="floor"></div>
+      </div>
       <div class="loader-word" aria-hidden="true"><span>A</span><span>P</span><span>O</span><span>L</span><span>L</span><span>O</span></div>
       <p class="loader-tag" data-t="loader_tag"></p>
     </div>
+    <div class="door door-l"></div><div class="door door-r"></div>
+    <div class="seam"></div>
+    <p class="loader-skip" data-t="loader_skip"></p>
     <div class="loader-bar"><i></i></div>
   </div>
 
@@ -73,7 +83,9 @@
         <a href="#programs" data-t="nav_programs"></a>
         <a href="#story" data-t="nav_story"></a>
         <a href="#plans" data-t="nav_plans"></a>
+        <a href="#faq" data-t="nav_faq"></a>
         <a href="#visit" data-t="nav_visit"></a>
+        <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
       </nav>
       <div class="header-actions">
         <button id="lang" class="lang" type="button" data-t="lang_btn"></button>
@@ -92,7 +104,10 @@
       <a href="#story" data-t="nav_story"></a>
       <a href="#members" data-t="nav_members"></a>
       <a href="#plans" data-t="nav_plans"></a>
+      <a href="#faq" data-t="nav_faq"></a>
       <a href="#visit" data-t="nav_visit"></a>
+      <a href="#franchise" data-t="nav_franchise"></a>
+      <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
     </nav>
     <a class="btn btn-big wa-link overlay-cta" href="#visit" data-t="cta_tour"></a>
   </div>
@@ -102,7 +117,10 @@
     <section class="hero" id="hero">
       <div class="hero-bg" aria-hidden="true">
         <!-- PLACEHOLDER image: frame from Apollo's own Instagram gym guide -->
-        <img class="hero-photo" src="assets/img/space/cardio.webp" alt="" fetchpriority="high">
+        <picture>
+          <source media="(max-width: 720px)" srcset="assets/img/red-weights.webp">
+          <img class="hero-photo" src="assets/img/space/cardio.webp" alt="" fetchpriority="high">
+        </picture>
         <div class="hero-shade"></div>
         <div class="sun" id="sun"></div>
         <div class="hero-grain"></div>
@@ -206,6 +224,28 @@
       </div>
     </section>
 
+    <!-- FAQ -->
+    <section class="section faq-section" id="faq">
+      <div class="wrap">
+        <p class="kicker reveal" data-t="faq_kicker"></p>
+        <h2 class="split" data-t="faq_title"></h2>
+        <p class="lead reveal" data-t="faq_text"></p>
+        <div class="faq" id="faq-list"></div>
+      </div>
+    </section>
+
+    <!-- LIVE -->
+    <section class="live" id="live">
+      <div class="wrap live-row reveal">
+        <div class="live-pulse" aria-hidden="true"><i></i></div>
+        <div class="live-copy">
+          <h2 data-t="live_title"></h2>
+          <p data-t="live_text"></p>
+        </div>
+        <a class="btn live-btn" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_cta"></a>
+      </div>
+    </section>
+
     <!-- VISIT -->
     <section class="section visit-section" id="visit">
       <div class="wrap">
@@ -231,8 +271,25 @@
       </div>
     </section>
 
+    <!-- FRANCHISE -->
+    <section class="section franchise-section" id="franchise">
+      <div class="wrap franchise-row">
+        <svg class="franchise-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
+        <div>
+          <p class="kicker reveal" data-t="franchise_kicker"></p>
+          <h2 class="split" data-t="franchise_title"></h2>
+          <p class="lead reveal" data-t="franchise_text"></p>
+          <div class="contact-links reveal">
+            <a class="btn wa-link" href="#" data-t="franchise_cta"></a>
+            <a class="btn btn-ghost mail-link" href="#" data-t="franchise_mail"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- FINAL -->
     <section class="final" id="final">
+      <img class="final-photo" src="assets/img/red-weights.webp" alt="" loading="lazy">
       <div class="final-sun" aria-hidden="true"></div>
       <div class="wrap final-inner">
         <p class="final-word split" data-t="final_word"></p>

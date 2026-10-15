@@ -21,10 +21,11 @@ const TEXT = {
   en: {
     lang_btn: 'عربي',
     menu: 'Menu', close: 'Close',
-    nav_space: 'The space', nav_programs: 'Train', nav_story: 'Story', nav_members: 'Members', nav_plans: 'Membership', nav_visit: 'Visit',
+    nav_space: 'The space', nav_programs: 'Train', nav_story: 'Story', nav_members: 'Members', nav_plans: 'Membership', nav_visit: 'Visit', nav_faq: 'FAQ', nav_franchise: 'Franchise', nav_live: 'Live',
     nav_cta: 'Book a tour',
     loader_tag: 'Welcome to the next level',
-    hero_eyebrow: 'Apollo Training Facility · Mecca Street, Amman',
+    loader_skip: 'Tap to skip',
+    hero_eyebrow: 'Apollo Training Facility · Community gym · Mecca Street, Amman',
     hero_l1: 'Rule your', hero_l2: 'destiny.', hero_l3: 'Defy the', hero_l4: 'limits.',
     hero_sub: 'Amman’s community gym. 840 square metres of iron, turf and good people, open from 6 AM.',
     cta_tour: 'Book your tour', cta_space: 'See the space',
@@ -52,12 +53,18 @@ const TEXT = {
     plans_text: 'October 2026 prices. The first 10 members to sign up with this offer get one extra month free.',
     jd: 'JD', per: 'for', popular: 'Best value', plan_cta: 'Ask on WhatsApp',
     referral_title: 'Apollo Referral League', referral_text: 'Bring your people. The member with the most referrals in 2026 wins a full year of membership for themselves and a loved one.',
-    visit_kicker: '07 · Visit', visit_title: 'Come see it',
+    faq_kicker: '07 · FAQ', faq_title: 'Good questions',
+    faq_text: 'The things people ask before their first visit. Anything else, send a message.',
+    live_title: 'Apollo Live', live_text: 'See how busy the floor is right now, before you leave the house.', live_cta: 'Open Apollo Live',
+    visit_kicker: '08 · Visit', visit_title: 'Come see it',
     hours_title: 'Opening hours', contact_title: 'Talk to us', address_title: 'Find us',
     address: 'Mecca Street, Al Sayegh Commercial Complex #181, Amman, Jordan',
     directions: 'Get directions', call: 'Call', whatsapp: 'WhatsApp', instagram: 'Instagram',
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     today: 'Today',
+    franchise_kicker: '09 · Franchise', franchise_title: 'Own an Apollo',
+    franchise_text: 'Apollo is open to franchise partners who want to bring the community gym to a new city. Talk to the team about how it works.',
+    franchise_cta: 'Ask on WhatsApp', franchise_mail: 'Email the team',
     final_word: 'Rise.', final_title: 'Your first session starts with one message.', final_cta: 'Book your tour',
     footer_name: 'Apollo Training Facility', footer_addr: 'Mecca Street, Amman',
     footer_credit: 'Site by LabsUncut',
@@ -66,10 +73,11 @@ const TEXT = {
   ar: {
     lang_btn: 'EN',
     menu: 'القائمة', close: 'إغلاق',
-    nav_space: 'المكان', nav_programs: 'تمرّن', nav_story: 'القصة', nav_members: 'الأعضاء', nav_plans: 'الاشتراكات', nav_visit: 'زورونا',
+    nav_space: 'المكان', nav_programs: 'تمرّن', nav_story: 'القصة', nav_members: 'الأعضاء', nav_plans: 'الاشتراكات', nav_visit: 'زورونا', nav_faq: 'الأسئلة', nav_franchise: 'الامتياز', nav_live: 'مباشر',
     nav_cta: 'احجز جولة',
     loader_tag: 'أهلاً بك في المستوى التالي',
-    hero_eyebrow: 'أبولو للتدريب · شارع مكة، عمّان',
+    loader_skip: 'اضغط للتخطي',
+    hero_eyebrow: 'أبولو للتدريب · نادي رياضي مجتمعي · شارع مكة، عمّان',
     hero_l1: 'تحكّم', hero_l2: 'بمصيرك.', hero_l3: 'تحدَّ', hero_l4: 'الحدود.',
     hero_sub: 'نادي عمّان المجتمعي. ٨٤٠ متراً مربعاً من الحديد والعشب والناس الطيبين، من الساعة ٦ صباحاً.',
     cta_tour: 'احجز جولتك', cta_space: 'شاهد المكان',
@@ -97,12 +105,18 @@ const TEXT = {
     plans_text: 'أسعار أكتوبر ٢٠٢٦. أول ١٠ أعضاء يشتركون بهذا العرض يحصلون على شهر إضافي مجاناً.',
     jd: 'د.أ', per: 'لمدة', popular: 'الأفضل قيمة', plan_cta: 'اسأل على واتساب',
     referral_title: 'دوري الإحالات', referral_text: 'جيب ناسك. العضو صاحب أكبر عدد إحالات في ٢٠٢٦ يربح اشتراك سنة كاملة له ولشخص عزيز عليه.',
-    visit_kicker: '٠٧ · زورونا', visit_title: 'تعال شوفه بنفسك',
+    faq_kicker: '٠٧ · الأسئلة الشائعة', faq_title: 'أسئلة بمحلها',
+    faq_text: 'الأشياء التي يسألها الناس قبل أول زيارة. أي شيء آخر، ابعث رسالة.',
+    live_title: 'أبولو مباشر', live_text: 'شوف كم الصالة مزدحمة الآن، قبل ما تطلع من البيت.', live_cta: 'افتح أبولو مباشر',
+    visit_kicker: '٠٨ · زورونا', visit_title: 'تعال شوفه بنفسك',
     hours_title: 'ساعات العمل', contact_title: 'تواصل معنا', address_title: 'موقعنا',
     address: 'شارع مكة، مجمع الصايغ التجاري #181، عمّان، الأردن',
     directions: 'الاتجاهات', call: 'اتصل', whatsapp: 'واتساب', instagram: 'إنستغرام',
     days: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
     today: 'اليوم',
+    franchise_kicker: '٠٩ · الامتياز التجاري', franchise_title: 'امتلك أبولو',
+    franchise_text: 'أبولو منفتح على شركاء امتياز يريدون نقل النادي المجتمعي إلى مدينة جديدة. تواصل مع الفريق لتعرف كيف يتم الأمر.',
+    franchise_cta: 'اسأل على واتساب', franchise_mail: 'راسل الفريق',
     final_word: 'ارتقِ.', final_title: 'أول تمرين يبدأ برسالة واحدة.', final_cta: 'احجز جولتك',
     footer_name: 'أبولو للتدريب', footer_addr: 'شارع مكة، عمّان',
     footer_credit: 'الموقع من LabsUncut',
@@ -169,6 +183,16 @@ const QUOTES = [
 ];
 
 // Membership prices from Apollo's "October 2026" Instagram post.
+// Only facts from Apollo's listings and this site: hours, trial classes, parking, prices.
+const FAQ = [
+  { en: ['When are you open?', 'Saturday to Thursday from 6:00 AM to 11:30 PM, and Friday from 11:00 AM to 7:00 PM.'], ar: ['متى تفتحون؟', 'من السبت إلى الخميس من ٦:٠٠ صباحاً حتى ١١:٣٠ مساءً، والجمعة من ١١:٠٠ صباحاً حتى ٧:٠٠ مساءً.'] },
+  { en: ['Can I try before I join?', 'Yes. Trial classes are available. Message us on WhatsApp and we will book you in.'], ar: ['هل أقدر أجرّب قبل الاشتراك؟', 'نعم. الحصص التجريبية متاحة. ابعث لنا على واتساب ونحجز لك.'] },
+  { en: ['How much is membership?', 'October 2026 prices: 150 JD for 1 month, 250 JD for 3 months, 300 JD for 9 months. Ask on WhatsApp for the current offer.'], ar: ['كم الاشتراك؟', 'أسعار تشرين الأول ٢٠٢٦: ١٥٠ ديناراً لشهر، ٢٥٠ ديناراً لثلاثة أشهر، ٣٠٠ دينار لتسعة أشهر. اسأل على واتساب عن العرض الحالي.'] },
+  { en: ['Is it busy right now?', 'Check Apollo Live before you come. It shows how full the floor is at this moment.'], ar: ['هل الصالة مزدحمة الآن؟', 'افتح أبولو مباشر قبل ما تيجي. يعرض لك كم الصالة ممتلئة في هذه اللحظة.'] },
+  { en: ['Where do I park?', 'There is on-site parking at Al Sayegh Commercial Complex #181 on Mecca Street.'], ar: ['وين أركن؟', 'يوجد موقف سيارات في مجمع الصايغ التجاري رقم ١٨١ على شارع مكة.'] },
+  { en: ['What is there besides the gym floor?', 'A cafeteria, a lounge, showers and lockers. Come early, stay late.'], ar: ['شو في غير صالة التمرين؟', 'كافتيريا وصالة استراحة ودُشّات وخزائن. تعال بكّير وابقَ لوقت متأخر.'] }
+];
+
 const PLANS = [
   // Perks are not published, so each plan shows only its price, length and the offer. PLACEHOLDER until Apollo lists what's included.
   { price: 150, months: 1, en: ['1 month', ['Full gym access']], ar: ['شهر', ['دخول كامل للنادي']] },
