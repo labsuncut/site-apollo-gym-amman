@@ -53,6 +53,7 @@
 
   <!-- Intro: the doors open, the mark lands on the stone, the sign flickers on -->
   <div class="loader" id="loader" aria-hidden="true">
+    <canvas class="loader-3d" id="loader-3d"></canvas>
     <div class="loader-scene">
       <div class="temple"><i class="column column-l"></i><i class="column column-r"></i></div>
       <div class="shaft"></div>
@@ -119,7 +120,7 @@
         <!-- PLACEHOLDER image: frame from Apollo's own Instagram gym guide -->
         <picture>
           <source media="(max-width: 720px)" srcset="assets/img/red-weights.webp">
-          <img class="hero-photo" src="assets/img/space/cardio.webp" alt="" fetchpriority="high">
+          <img class="hero-photo" src="assets/img/hero-cardio.webp" alt="" fetchpriority="high">
         </picture>
         <div class="hero-shade"></div>
         <div class="sun" id="sun"></div>
@@ -316,5 +317,6 @@
   <script src="assets/js/vendor/lenis.min.js"></script>
   <script src="assets/js/content.js"></script>
   <script src="assets/js/site.js"></script>
+  <script type="module" src="assets/js/intro3d.js"></script>
 </body>
 </html>

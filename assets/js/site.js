@@ -147,53 +147,73 @@
   });
 
   // ---------- Intro: you walk into the facility ----------
-  // The doors part on a red seam, the mark drops out of the dark and lands on the stone,
-  // the sign flickers on, then the camera pushes through into the hero. About 2.8s.
-  // Any tap, click, key or scroll fast-forwards it; after the first play in this tab it runs
-  // at triple speed so switching language or reloading never makes anyone sit through it.
+  // Two versions share one ending. intro3d.js (a module, loads after this file) renders the
+  // real thing with Three.js: marble columns, a stone plinth, the 3D mark dropping onto it.
+  // If WebGL is missing or the module fails, the CSS version below plays instead.
   const loader = $('#loader'), mark = $('.loader-mark'), scene = $('.loader-scene');
   let seen = false;
   try { seen = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
-  const dust = $('#dust');
-  for (let i = 0; i < 16; i++) dust.appendChild(document.createElement('i'));
-  const intro = gsap.timeline({ onComplete: () => { loader.remove(); lenis.start(); ScrollTrigger.refresh(); } });
-  const flick = [1, .15, 1, .1, .9, .2, 1];
-  intro
-    .set(mark, { yPercent: -260, opacity: 1, filter: 'brightness(.35)' })
-    .to('.seam', { opacity: 1, scaleY: 1, duration: .45, ease: 'power2.out' }, .1)
-    .to('.door-l', { xPercent: -100, duration: .9, ease: 'expo.inOut' }, .5)
-    .to('.door-r', { xPercent: 100, duration: .9, ease: 'expo.inOut' }, .5)
-    .to('.seam', { opacity: 0, duration: .3 }, .55)
-    .to(['.temple', '.shaft', '.spot'], { opacity: 1, duration: .9, ease: 'power2.out' }, .6)
-    .to(mark, { yPercent: 0, duration: .5, ease: 'power3.in' }, .95)
-    // impact
-    .to(mark, { scaleY: .86, scaleX: 1.08, duration: .08, ease: 'power1.out' }, 1.45)
-    .to(mark, { scaleY: 1, scaleX: 1, duration: .25, ease: 'elastic.out(1, .5)' }, 1.53)
-    .fromTo(scene, { x: 0 }, { x: 7, duration: .05, repeat: 5, yoyo: true, ease: 'none' }, 1.45)
-    .set(scene, { x: 0 }, 1.78)
-    .to('.plinth-glow', { opacity: 1, duration: .08 }, 1.45)
-    .to('.plinth-glow', { opacity: .45, duration: .6 }, 1.55)
-    .fromTo('.dust i', { x: 0, y: 0, opacity: 1 }, { x: () => gsap.utils.random(-140, 140), y: () => gsap.utils.random(-90, -16), opacity: 0, duration: .75, ease: 'power3.out', stagger: .006 }, 1.45);
-  flick.forEach((o, i) => intro.set(mark, { filter: 'brightness(' + o + ')' }, 1.5 + i * .06));
-  intro.add(() => mark.classList.add('lit'), 1.92)
-    .set(mark, { filter: 'brightness(1)' }, 1.92)
-    .to('.loader-word span', { opacity: 1, scale: 1, duration: .45, stagger: .035, ease: 'power3.out' }, 1.6)
-    .to('.loader-tag', { opacity: 1, duration: .4 }, 1.95)
-    .to('.loader-bar i', { scaleX: 1, duration: 2.1, ease: 'power2.inOut' }, .3)
-    // walk in: the camera pushes past the sign into the gym
-    .to(scene, { scale: 2.2, opacity: 0, duration: .7, ease: 'power3.in' }, 2.35)
-    .to(loader, { opacity: 0, duration: .5, ease: 'power2.in' }, 2.6)
-    .from('.hero-photo', { scale: 1.2, duration: 1.6, ease: 'power3.out' }, 2.6)
-    .to('.display .line > span', { y: 0, duration: 1, ease: 'power4.out', stagger: .09 }, 2.75)
-    .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, 3.1)
-    .to('.scroll-cue', { opacity: 1, duration: .7 }, 3.4);
-  if (seen) intro.timeScale(3);
-  window.apolloIntro = intro;
-  const skipIntro = () => { if (intro.progress() < 1 && intro.timeScale() < 6) intro.timeScale(6); };
-  loader.addEventListener('click', skipIntro);
-  loader.addEventListener('touchstart', skipIntro, { passive: true });
-  addEventListener('keydown', skipIntro, { once: true });
-  addEventListener('wheel', skipIntro, { passive: true, once: true });
+  const finishIntro = () => { loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
+  // The hero wakes up: photo settles, headline lines rise, buttons and cue fade in.
+  const heroIn = (tl, at) => tl
+    .from('.hero-photo', { scale: 1.2, duration: 1.6, ease: 'power3.out' }, at)
+    .to('.display .line > span', { y: 0, duration: 1, ease: 'power4.out', stagger: .09 }, at + .15)
+    .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, at + .5)
+    .to('.scroll-cue', { opacity: 1, duration: .7 }, at + .8);
+  const armIntro = (tl) => {
+    if (seen) tl.timeScale(1.6);
+    window.apolloIntro = tl;
+    const skip = () => { if (tl.progress() < 1 && tl.timeScale() < 6) tl.timeScale(6); };
+    loader.addEventListener('click', skip);
+    loader.addEventListener('touchstart', skip, { passive: true });
+    addEventListener('keydown', skip, { once: true });
+    addEventListener('wheel', skip, { passive: true, once: true });
+  };
+  const domIntro = () => {
+    if (window.APOLLO) window.APOLLO.fallback = true;
+    html.classList.remove('intro3d');
+    $('.seam').style.animation = 'none';
+    const dust = $('#dust');
+    for (let i = 0; i < 16; i++) dust.appendChild(document.createElement('i'));
+    const intro = gsap.timeline({ onComplete: finishIntro });
+    const flick = [1, .15, 1, .1, .9, .2, 1];
+    intro
+      .set(mark, { yPercent: -260, opacity: 1, filter: 'brightness(.35)' })
+      .to('.seam', { opacity: 1, scaleY: 1, duration: .45, ease: 'power2.out' }, .1)
+      .to('.door-l', { xPercent: -100, duration: .9, ease: 'expo.inOut' }, .5)
+      .to('.door-r', { xPercent: 100, duration: .9, ease: 'expo.inOut' }, .5)
+      .to('.seam', { opacity: 0, duration: .3 }, .55)
+      .to(['.temple', '.shaft', '.spot'], { opacity: 1, duration: .9, ease: 'power2.out' }, .6)
+      .to(mark, { yPercent: 0, duration: .5, ease: 'power3.in' }, .95)
+      .to(mark, { scaleY: .86, scaleX: 1.08, duration: .08, ease: 'power1.out' }, 1.45)
+      .to(mark, { scaleY: 1, scaleX: 1, duration: .25, ease: 'elastic.out(1, .5)' }, 1.53)
+      .fromTo(scene, { x: 0 }, { x: 7, duration: .05, repeat: 5, yoyo: true, ease: 'none' }, 1.45)
+      .set(scene, { x: 0 }, 1.78)
+      .to('.plinth-glow', { opacity: 1, duration: .08 }, 1.45)
+      .to('.plinth-glow', { opacity: .45, duration: .6 }, 1.55)
+      .fromTo('.dust i', { x: 0, y: 0, opacity: 1 }, { x: () => gsap.utils.random(-140, 140), y: () => gsap.utils.random(-90, -16), opacity: 0, duration: .75, ease: 'power3.out', stagger: .006 }, 1.45);
+    flick.forEach((o, i) => intro.set(mark, { filter: 'brightness(' + o + ')' }, 1.5 + i * .06));
+    intro.add(() => mark.classList.add('lit'), 1.92)
+      .set(mark, { filter: 'brightness(1)' }, 1.92)
+      .to('.loader-word span', { opacity: 1, scale: 1, duration: .45, stagger: .035, ease: 'power3.out' }, 1.6)
+      .to('.loader-tag', { opacity: 1, duration: .4 }, 1.95)
+      .to('.loader-bar i', { scaleX: 1, duration: 2.1, ease: 'power2.inOut' }, .3)
+      .to(scene, { scale: 2.2, opacity: 0, duration: .7, ease: 'power3.in' }, 2.35)
+      .to(loader, { opacity: 0, duration: .5, ease: 'power2.in' }, 2.6);
+    heroIn(intro, 2.6);
+    armIntro(intro);
+    return intro;
+  };
+  let webgl = false;
+  try { const c = document.createElement('canvas'); webgl = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) {}
+  if (webgl) {
+    html.classList.add('intro3d');
+    window.APOLLO = { finishIntro, heroIn, armIntro, domIntro, seen };
+    // Safety net: if the 3D module never reports in, play the CSS intro instead.
+    window.APOLLO.timer = setTimeout(() => { if (!window.APOLLO.started) domIntro(); }, 7000);
+  } else {
+    domIntro();
+  }
 
   // ---------- Hero: the sun rises, the photo drifts ----------
   gsap.to('#sun', { yPercent: -45, scale: 1.25, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
