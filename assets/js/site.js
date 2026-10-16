@@ -151,10 +151,7 @@
     $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
     // Reduced motion: the lit symbol held still, then a plain dissolve into the page.
     const ld = $('#loader');
-    let seenRM = false;
-    try { seenRM = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
-    if (seenRM) ld.remove();
-    else { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1100); }
+    { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1100); }
     $('#tour-bar').style.transform = 'none';
     $('#timeline-fill').style.transform = 'none';
     return;
@@ -188,8 +185,8 @@
   // Story: dormant / first weak cluster that fades / dark pause / stronger second cluster
   // with one soft dip / smooth activation / steady hold / dissolve into the homepage.
   const loader = $('#loader');
-  let seen = false;
-  try { seen = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
+  // The signal plays on every load, refresh included (team decision 2026-10-16).
+  const seen = false;
   const finishIntro = () => { if (loader.isConnected) loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
   const heroIn = (tl, at) => tl
     .to('.display .line > span', { y: 0, opacity: 1, duration: .9, ease: 'power2.out', stagger: .08 }, at)
