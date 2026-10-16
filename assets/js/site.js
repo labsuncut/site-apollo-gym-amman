@@ -149,12 +149,12 @@
     $$('.reveal, .hero-foot > *, .scroll-cue').forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
     $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; el.style.opacity = 1; });
     $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
-    // Reduced motion: a brief static view of the doors and logo, then a plain fade.
+    // Reduced motion: the lit symbol held still, then a plain dissolve into the page.
     const ld = $('#loader');
     let seenRM = false;
     try { seenRM = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
     if (seenRM) ld.remove();
-    else { ld.style.transition = 'opacity .5s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 520); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 700); }
+    else { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1100); }
     $('#tour-bar').style.transform = 'none';
     $('#timeline-fill').style.transform = 'none';
     return;
@@ -182,9 +182,11 @@
     gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
 
-  // ---------- Intro: two charcoal doors open onto the gym ----------
-  // Storyboard: 0-0.5 establish (logo fades in), 0.5-0.9 the seam lights, 0.9-2.4 one continuous
-  // open while the logo fades, hero text rises from 1.6 so the handoff is seamless. Plays once per tab.
+  // ---------- Intro: Apollo's signal comes alive ----------
+  // An authored brightness curve (0 = dark, 1 = fully lit) drives three light layers:
+  // the lit mark, a tight halo, and a soft ambient spill that lags a little behind.
+  // Story: dormant / first weak cluster that fades / dark pause / stronger second cluster
+  // with one soft dip / smooth activation / steady hold / dissolve into the homepage.
   const loader = $('#loader');
   let seen = false;
   try { seen = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
@@ -198,25 +200,47 @@
     heroIn(gsap.timeline(), 0);
     lenis.start();
   } else {
-    const intro = gsap.timeline({ onComplete: finishIntro });
+    const lit = $('.signal-lit'), halo = $('.signal-halo'), spill = $('.signal-spill'), dim = $('.signal-dim');
+    const L = { v: 0, s: 0 };
+    const paint = () => {
+      L.s += (L.v - L.s) * .22;                      // the spill follows softly
+      lit.style.opacity = L.v;
+      halo.style.opacity = Math.pow(L.v, 1.6) * .9;  // the halo only really appears once the core is bright
+      spill.style.opacity = Math.pow(L.s, 1.2) * .85;
+      dim.style.opacity = 1 - L.v * .6;
+    };
+    const intro = gsap.timeline({ onUpdate: paint, onComplete: finishIntro });
+    // Each step: brightness target, duration. Unequal lengths and peaks on purpose.
+    const steps = [
+      // 0.00-0.35 dormant
+      [0, .35, 'none'],
+      // 0.35-1.20 first attempt: weak, uneven, then a fade to dark
+      [.3, .07, 'power1.out'], [.1, .09, 'power1.in'], [.44, .08, 'power1.out'], [.16, .13, 'power1.inOut'], [.52, .1, 'power1.out'], [.26, .06, 'none'], [0, .32, 'power2.in'],
+      // 1.20-1.55 dark pause
+      [0, .35, 'none'],
+      // 1.55-2.45 second attempt: stronger, nearly stable, one soft dip
+      [.56, .08, 'power1.out'], [.3, .09, 'power1.in'], [.82, .1, 'power1.out'], [.64, .08, 'power1.inOut'], [.9, .25, 'power1.out'], [.46, .15, 'power1.inOut'], [.7, .15, 'power1.out'],
+      // 2.45-3.05 activation
+      [1, .6, 'power2.out'],
+      // 3.05-3.45 steady hold
+      [1, .4, 'none']
+    ];
+    steps.forEach(([v, d, e]) => intro.to(L, { v, duration: d, ease: e }));
+    // 3.45-4.15 arrival: the dark dissolves into the hero, the signal fades, the words rise.
     intro
-      .to('.loader-logo', { opacity: 1, duration: .5, ease: 'power1.out' }, 0)
-      .to('.loader-skip', { opacity: 1, duration: .4 }, .3)
-      .to('.seam', { opacity: .5, duration: .4, ease: 'power1.in' }, .5)
-      .to('.seam-glow', { opacity: .7, duration: .4 }, .5)
-      .to('.seam', { opacity: 1, duration: .15 }, .9)
-      .to('.door-l', { xPercent: -100, duration: 1.5, ease: 'power2.inOut' }, .9)
-      .to('.door-r', { xPercent: 100, duration: 1.5, ease: 'power2.inOut' }, .9)
-      .to('.loader-logo', { opacity: 0, duration: .35, ease: 'power1.in' }, .9)
-      .to(['.seam', '.seam-glow'], { opacity: 0, duration: .6 }, 1.05)
-      .to('.loader-skip', { opacity: 0, duration: .3 }, 1.8);
-    heroIn(intro, 1.6);
+      .to('.loader-skip', { opacity: 1, duration: .4 }, .2)
+      .to('.signal-bg', { opacity: 0, duration: .7, ease: 'power1.inOut' }, 3.45)
+      .to('.signal', { opacity: 0, duration: .45, ease: 'power1.in' }, 3.55)
+      .to('.signal-spill', { opacity: 0, duration: .5, ease: 'power1.in', onComplete: () => { spill.style.opacity = 0; } }, 3.65)
+      .to('.loader-skip', { opacity: 0, duration: .3 }, 3.5)
+      .add(finishIntro, 4.15);
+    heroIn(intro, 3.6);
     window.apolloIntro = intro;
     const skip = () => { if (intro.progress() < 1) intro.progress(1); };
     $('#loader-skip').addEventListener('click', skip);
     addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') skip(); }, { once: true });
     // Safety: nothing may block the site. If the timeline never completes, open anyway.
-    setTimeout(finishIntro, 6000);
+    setTimeout(finishIntro, 7000);
   }
 
   // ---------- Hero: the sun rises, the photo drifts ----------

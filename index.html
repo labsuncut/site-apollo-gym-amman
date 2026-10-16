@@ -51,11 +51,15 @@
     </symbol>
   </svg>
 
-  <!-- Intro: two charcoal doors part on a seam of red light and the real homepage is already behind them -->
+  <!-- Intro: Apollo's signal comes alive. The unlit mark sits in the dark, flickers in clusters, catches, holds, then the homepage dissolves in behind it -->
   <div class="loader" id="loader">
-    <div class="door door-l"></div><div class="door door-r"></div>
-    <div class="seam-glow" aria-hidden="true"></div><div class="seam" aria-hidden="true"></div>
-    <img class="loader-logo" src="assets/img/logo-lockup-white.png" width="781" height="220" alt="Apollo Training Facility">
+    <div class="signal-bg" aria-hidden="true"></div>
+    <div class="signal-spill" aria-hidden="true"></div>
+    <div class="signal" aria-hidden="true">
+      <svg class="signal-dim" viewBox="0 0 100 100"><use href="#mark"/></svg>
+      <svg class="signal-halo" viewBox="0 0 100 100"><use href="#mark"/></svg>
+      <svg class="signal-lit" viewBox="0 0 100 100"><use href="#mark"/></svg>
+    </div>
     <button class="loader-skip" id="loader-skip" type="button" data-t="loader_skip"></button>
   </div>
 
