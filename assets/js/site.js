@@ -24,6 +24,8 @@
   // ---------- Links ----------
   const wa = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(T.wa_msg)}`;
   $$('.wa-link').forEach((a) => { a.href = wa; a.target = '_blank'; a.rel = 'noopener'; });
+  const waMember = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(T.wa_member_msg)}`;
+  $$('.wa-member').forEach((a) => { a.href = waMember; a.target = '_blank'; a.rel = 'noopener'; });
   $$('.tel-link').forEach((a) => { a.href = `tel:${BUSINESS.phone}`; });
   $$('.ig-link').forEach((a) => { a.href = BUSINESS.instagram; });
   $$('.mail-link').forEach((a) => { a.href = `mailto:${BUSINESS.email}`; });
@@ -78,11 +80,15 @@
   // ---------- Quotes ----------
   $('#quotes').innerHTML = QUOTES.map((q) => `<blockquote class="quote reveal"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`).join('');
 
-  // ---------- Plans ----------
+  // ---------- FAQ, membership, family ----------
   $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
-  $('#plans-grid').innerHTML = PLANS.map((p) => {
-    const [name, perks] = p[lang];
-    return `<article class="plan reveal${p.popular ? ' is-popular' : ''}">${p.popular ? `<span class="plan-tag">${esc(T.popular)}</span>` : ''}<h3>${esc(name)}</h3><div class="plan-price"><b>${p.price}</b><small>${esc(T.jd)}</small></div><ul>${perks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><a class="btn btn-ghost" href="${wa}" target="_blank" rel="noopener">${esc(T.plan_cta)}</a></article>`;
+  $('#includes').innerHTML = T.includes.map((x) => `<li>${esc(x)}</li>`).join('');
+  $('#enquire-lines').innerHTML = [[BUSINESS.phone, BUSINESS.phoneDisplay], ['+' + BUSINESS.whatsapp, BUSINESS.mobileDisplay]].map(([n, d]) => `<a href="tel:${esc(n)}" dir="ltr">${esc(d)}</a>`).join('<span aria-hidden="true"> · </span>');
+  $('#family-grid').innerHTML = FAMILY.map((f) => {
+    const [title, text] = f[lang];
+    const media = f.img ? `<img src="${esc(f.img.src)}" width="${f.img.w}" height="${f.img.h}" alt="${esc(title)}" loading="lazy" style="object-position:${esc(f.img.focus || '50% 50%')}">`
+      : `<div class="family-slot"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg><span>${esc(T.family_slot)}</span></div>`;
+    return `<article class="family-card reveal"><div class="family-media">${media}</div><h3>${esc(title)}</h3><p>${esc(text)}</p></article>`;
   }).join('');
 
   // ---------- Hours + open badge ----------
@@ -141,9 +147,14 @@
   // ---------- No motion: show everything and stop ----------
   if (!motion) {
     $$('.reveal, .hero-foot > *, .scroll-cue').forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
-    $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; });
+    $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; el.style.opacity = 1; });
     $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
-    $('#loader').remove();
+    // Reduced motion: a brief static view of the doors and logo, then a plain fade.
+    const ld = $('#loader');
+    let seenRM = false;
+    try { seenRM = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
+    if (seenRM) ld.remove();
+    else { ld.style.transition = 'opacity .5s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 520); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 700); }
     $('#tour-bar').style.transform = 'none';
     $('#timeline-fill').style.transform = 'none';
     return;
@@ -171,73 +182,41 @@
     gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
 
-  // ---------- Intro: you walk into the facility ----------
-  // Two versions share one ending. intro3d.js (a module, loads after this file) renders the
-  // real thing with Three.js: marble columns, a stone plinth, the 3D mark dropping onto it.
-  // If WebGL is missing or the module fails, the CSS version below plays instead.
-  const loader = $('#loader'), mark = $('.loader-mark'), scene = $('.loader-scene');
+  // ---------- Intro: two charcoal doors open onto the gym ----------
+  // Storyboard: 0-0.5 establish (logo fades in), 0.5-0.9 the seam lights, 0.9-2.4 one continuous
+  // open while the logo fades, hero text rises from 1.6 so the handoff is seamless. Plays once per tab.
+  const loader = $('#loader');
   let seen = false;
   try { seen = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); } catch (e) {}
-  const finishIntro = () => { loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
-  // The hero wakes up: photo settles, headline lines rise, buttons and cue fade in.
+  const finishIntro = () => { if (loader.isConnected) loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
   const heroIn = (tl, at) => tl
-    .from('.hero-photo', { scale: 1.2, duration: 1.6, ease: 'power3.out' }, at)
-    .to('.display .line > span', { y: 0, duration: 1, ease: 'power4.out', stagger: .09 }, at + .15)
-    .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, at + .5)
-    .to('.scroll-cue', { opacity: 1, duration: .7 }, at + .8);
-  const armIntro = (tl) => {
-    if (seen) tl.timeScale(1.6);
-    window.apolloIntro = tl;
-    const skip = () => { if (tl.progress() < 1 && tl.timeScale() < 6) tl.timeScale(6); };
-    loader.addEventListener('click', skip);
-    loader.addEventListener('touchstart', skip, { passive: true });
-    addEventListener('keydown', skip, { once: true });
-    addEventListener('wheel', skip, { passive: true, once: true });
-  };
-  const domIntro = () => {
-    if (window.APOLLO) window.APOLLO.fallback = true;
-    html.classList.remove('intro3d');
-    $('.seam').style.animation = 'none';
-    const dust = $('#dust');
-    for (let i = 0; i < 16; i++) dust.appendChild(document.createElement('i'));
-    const intro = gsap.timeline({ onComplete: finishIntro });
-    const flick = [1, .15, 1, .1, .9, .2, 1];
-    intro
-      .set(mark, { yPercent: -260, opacity: 1, filter: 'brightness(.35)' })
-      .to('.seam', { opacity: 1, scaleY: 1, duration: .45, ease: 'power2.out' }, .1)
-      .to('.door-l', { xPercent: -100, duration: .9, ease: 'expo.inOut' }, .5)
-      .to('.door-r', { xPercent: 100, duration: .9, ease: 'expo.inOut' }, .5)
-      .to('.seam', { opacity: 0, duration: .3 }, .55)
-      .to(['.temple', '.shaft', '.spot'], { opacity: 1, duration: .9, ease: 'power2.out' }, .6)
-      .to(mark, { yPercent: 0, duration: .5, ease: 'power3.in' }, .95)
-      .to(mark, { scaleY: .86, scaleX: 1.08, duration: .08, ease: 'power1.out' }, 1.45)
-      .to(mark, { scaleY: 1, scaleX: 1, duration: .25, ease: 'elastic.out(1, .5)' }, 1.53)
-      .fromTo(scene, { x: 0 }, { x: 7, duration: .05, repeat: 5, yoyo: true, ease: 'none' }, 1.45)
-      .set(scene, { x: 0 }, 1.78)
-      .to('.plinth-glow', { opacity: 1, duration: .08 }, 1.45)
-      .to('.plinth-glow', { opacity: .45, duration: .6 }, 1.55)
-      .fromTo('.dust i', { x: 0, y: 0, opacity: 1 }, { x: () => gsap.utils.random(-140, 140), y: () => gsap.utils.random(-90, -16), opacity: 0, duration: .75, ease: 'power3.out', stagger: .006 }, 1.45);
-    flick.forEach((o, i) => intro.set(mark, { filter: 'brightness(' + o + ')' }, 1.5 + i * .06));
-    intro.add(() => mark.classList.add('lit'), 1.92)
-      .set(mark, { filter: 'brightness(1)' }, 1.92)
-      .to('.loader-word span', { opacity: 1, scale: 1, duration: .45, stagger: .035, ease: 'power3.out' }, 1.6)
-      .to('.loader-tag', { opacity: 1, duration: .4 }, 1.95)
-      .to('.loader-bar i', { scaleX: 1, duration: 2.1, ease: 'power2.inOut' }, .3)
-      .to(scene, { scale: 2.2, opacity: 0, duration: .7, ease: 'power3.in' }, 2.35)
-      .to(loader, { opacity: 0, duration: .5, ease: 'power2.in' }, 2.6);
-    heroIn(intro, 2.6);
-    armIntro(intro);
-    return intro;
-  };
-  let webgl = false;
-  try { const c = document.createElement('canvas'); webgl = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) {}
-  if (webgl) {
-    html.classList.add('intro3d');
-    window.APOLLO = { finishIntro, heroIn, armIntro, domIntro, seen };
-    // Safety net: if the 3D module never reports in, play the CSS intro instead.
-    window.APOLLO.timer = setTimeout(() => { if (!window.APOLLO.started) domIntro(); }, 7000);
+    .to('.display .line > span', { y: 0, opacity: 1, duration: .9, ease: 'power2.out', stagger: .08 }, at)
+    .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, at + .25)
+    .to('.scroll-cue', { opacity: 1, duration: .7 }, at + .5);
+  if (seen) {
+    loader.remove();
+    heroIn(gsap.timeline(), 0);
+    lenis.start();
   } else {
-    domIntro();
+    const intro = gsap.timeline({ onComplete: finishIntro });
+    intro
+      .to('.loader-logo', { opacity: 1, duration: .5, ease: 'power1.out' }, 0)
+      .to('.loader-skip', { opacity: 1, duration: .4 }, .3)
+      .to('.seam', { opacity: .5, duration: .4, ease: 'power1.in' }, .5)
+      .to('.seam-glow', { opacity: .7, duration: .4 }, .5)
+      .to('.seam', { opacity: 1, duration: .15 }, .9)
+      .to('.door-l', { xPercent: -100, duration: 1.5, ease: 'power2.inOut' }, .9)
+      .to('.door-r', { xPercent: 100, duration: 1.5, ease: 'power2.inOut' }, .9)
+      .to('.loader-logo', { opacity: 0, duration: .35, ease: 'power1.in' }, .9)
+      .to(['.seam', '.seam-glow'], { opacity: 0, duration: .6 }, 1.05)
+      .to('.loader-skip', { opacity: 0, duration: .3 }, 1.8);
+    heroIn(intro, 1.6);
+    window.apolloIntro = intro;
+    const skip = () => { if (intro.progress() < 1) intro.progress(1); };
+    $('#loader-skip').addEventListener('click', skip);
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') skip(); }, { once: true });
+    // Safety: nothing may block the site. If the timeline never completes, open anyway.
+    setTimeout(finishIntro, 6000);
   }
 
   // ---------- Hero: the sun rises, the photo drifts ----------

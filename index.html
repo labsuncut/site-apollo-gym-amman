@@ -44,33 +44,19 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <!-- Logo, drawn once and reused. PLACEHOLDER: a recreation of Apollo's mark until they send the original file. -->
+  <!-- Logo mark, traced from Apollo's own logo file, drawn once and reused. -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="mark" viewBox="0 0 100 100">
       <path d="M42 3 L3 97 H44 L28 76 L50 22 L72 76 L56 97 H97 L58 3 Z"/>
     </symbol>
   </svg>
 
-  <!-- Intro: the doors open, the mark lands on the stone, the sign flickers on -->
-  <div class="loader" id="loader" aria-hidden="true">
-    <canvas class="loader-3d" id="loader-3d"></canvas>
-    <div class="loader-scene">
-      <div class="temple"><i class="column column-l"></i><i class="column column-r"></i></div>
-      <div class="shaft"></div>
-      <div class="spot"></div>
-      <div class="altar">
-        <svg class="loader-mark" viewBox="0 0 100 100"><use href="#mark"/></svg>
-        <div class="dust" id="dust"></div>
-        <div class="plinth"><i class="plinth-top"></i><i class="plinth-face"></i><i class="plinth-glow"></i></div>
-        <div class="floor"></div>
-      </div>
-      <div class="loader-word" aria-hidden="true"><span>A</span><span>P</span><span>O</span><span>L</span><span>L</span><span>O</span></div>
-      <p class="loader-tag" data-t="loader_tag"></p>
-    </div>
+  <!-- Intro: two charcoal doors part on a seam of red light and the real homepage is already behind them -->
+  <div class="loader" id="loader">
     <div class="door door-l"></div><div class="door door-r"></div>
-    <div class="seam"></div>
-    <p class="loader-skip" data-t="loader_skip"></p>
-    <div class="loader-bar"><i></i></div>
+    <div class="seam-glow" aria-hidden="true"></div><div class="seam" aria-hidden="true"></div>
+    <img class="loader-logo" src="assets/img/logo-lockup-white.png" width="781" height="220" alt="Apollo Training Facility">
+    <button class="loader-skip" id="loader-skip" type="button" data-t="loader_skip"></button>
   </div>
 
   <header class="site-header" id="top">
@@ -80,17 +66,18 @@
         <span class="logo-word">APOLLO<small>Training Facility</small></span>
       </a>
       <nav class="nav" aria-label="Main">
+        <a href="#family" data-t="nav_family"></a>
         <a href="#space" data-t="nav_space"></a>
         <a href="#programs" data-t="nav_programs"></a>
         <a href="#story" data-t="nav_story"></a>
-        <a href="#plans" data-t="nav_plans"></a>
+        <a href="#membership" data-t="nav_plans"></a>
         <a href="#faq" data-t="nav_faq"></a>
         <a href="#visit" data-t="nav_visit"></a>
         <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
       </nav>
       <div class="header-actions">
         <button id="lang" class="lang" type="button" data-t="lang_btn"></button>
-        <a class="btn btn-small wa-link" href="#visit" data-t="nav_cta"></a>
+        <a class="btn btn-small tel-link" href="#" data-t="nav_cta"></a>
         <button id="menu-open" class="burger" type="button" aria-expanded="false" aria-controls="overlay"><span></span><span></span><span data-t="menu" class="sr"></span></button>
       </div>
     </div>
@@ -100,17 +87,18 @@
   <div class="overlay" id="overlay" hidden>
     <button id="menu-close" class="overlay-close" type="button" data-t="close"></button>
     <nav class="overlay-nav" aria-label="Phone menu">
+      <a href="#family" data-t="nav_family"></a>
       <a href="#space" data-t="nav_space"></a>
       <a href="#programs" data-t="nav_programs"></a>
       <a href="#story" data-t="nav_story"></a>
       <a href="#members" data-t="nav_members"></a>
-      <a href="#plans" data-t="nav_plans"></a>
+      <a href="#membership" data-t="nav_plans"></a>
       <a href="#faq" data-t="nav_faq"></a>
       <a href="#visit" data-t="nav_visit"></a>
       <a href="#franchise" data-t="nav_franchise"></a>
       <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
     </nav>
-    <a class="btn btn-big wa-link overlay-cta" href="#visit" data-t="cta_tour"></a>
+    <a class="btn btn-big tel-link overlay-cta" href="#" data-t="enquire_call"></a>
   </div>
 
   <main id="main">
@@ -135,8 +123,8 @@
         <div class="hero-foot">
           <p class="hero-sub" data-t="hero_sub"></p>
           <div class="hero-actions">
-            <a class="btn wa-link" href="#visit"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 0 1 12 4Zm-3 4.5c-.2 0-.5 0-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.3l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.9-2c-.2-.6-.5-.5-.6-.5h-.5Z"/></svg><span data-t="cta_tour"></span></a>
-            <a class="btn btn-ghost" href="#space" data-t="cta_space"></a>
+            <a class="btn tel-link" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z"/></svg><span data-t="enquire_call"></span></a>
+            <a class="btn btn-ghost wa-member" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 0 1 12 4Zm-3 4.5c-.2 0-.5 0-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.3l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.9-2c-.2-.6-.5-.5-.6-.5h-.5Z"/></svg><span data-t="enquire_short"></span></a>
           </div>
           <span id="open" class="open-badge"><i></i><span></span></span>
         </div>
@@ -151,6 +139,16 @@
     <!-- STATS -->
     <section class="stats" id="stats">
       <div class="wrap stats-grid" id="stats-grid"></div>
+    </section>
+
+    <!-- FAMILY: the community, early on purpose -->
+    <section class="section family-section" id="family">
+      <div class="wrap">
+        <p class="kicker reveal" data-t="family_kicker"></p>
+        <h2 class="split" data-t="family_title"></h2>
+        <p class="lead reveal" data-t="family_text"></p>
+        <div class="family-grid" id="family-grid"></div>
+      </div>
     </section>
 
     <!-- THE SPACE: horizontal tour -->
@@ -217,17 +215,26 @@
       </div>
     </section>
 
-    <!-- PLANS -->
-    <section class="section plans-section" id="plans">
-      <div class="wrap">
-        <p class="kicker reveal" data-t="plans_kicker"></p>
-        <h2 class="split" data-t="plans_title"></h2>
-        <p class="lead reveal" data-t="plans_text"></p>
-        <div class="plans" id="plans-grid"></div>
-        <div class="referral reveal">
-          <svg class="referral-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
-          <div><h3 data-t="referral_title"></h3><p data-t="referral_text"></p></div>
+    <!-- MEMBERSHIP: an invitation to talk, no prices -->
+    <section class="section membership-section" id="membership">
+      <div class="wrap membership-grid">
+        <div>
+          <p class="kicker reveal" data-t="membership_kicker"></p>
+          <h2 class="split" data-t="membership_title"></h2>
+          <p class="lead reveal" data-t="membership_text"></p>
+          <ul class="includes reveal" id="includes"></ul>
         </div>
+        <aside class="enquire reveal">
+          <svg class="enquire-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
+          <h3 data-t="enquire_title"></h3>
+          <p data-t="enquire_text"></p>
+          <div class="enquire-actions">
+            <a class="btn tel-link" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z"/></svg><span data-t="enquire_call"></span></a>
+            <a class="btn btn-ghost wa-member" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 0 1 12 4Zm-3 4.5c-.2 0-.5 0-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.3l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.9-2c-.2-.6-.5-.5-.6-.5h-.5Z"/></svg><span data-t="enquire_wa"></span></a>
+          </div>
+          <p class="enquire-lines" id="enquire-lines"></p>
+          <p class="enquire-note" data-t="enquire_note"></p>
+        </aside>
       </div>
     </section>
 
@@ -301,7 +308,7 @@
       <div class="wrap final-inner">
         <p class="final-word split" data-t="final_word"></p>
         <h2 class="final-title reveal" data-t="final_title"></h2>
-        <a class="btn btn-big wa-link reveal" href="#visit" data-t="final_cta"></a>
+        <div class="final-actions reveal"><a class="btn btn-big tel-link" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z"/></svg><span data-t="enquire_call"></span></a><a class="btn btn-big btn-ghost wa-member" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 0 1 12 4Zm-3 4.5c-.2 0-.5 0-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.3l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.9-2c-.2-.6-.5-.5-.6-.5h-.5Z"/></svg><span data-t="final_cta"></span></a></div>
       </div>
     </section>
   </main>
@@ -315,7 +322,7 @@
   </footer>
 
   <!-- Sticky WhatsApp bar on phones -->
-  <a class="call-bar wa-link" href="#visit" data-t="cta_tour"></a>
+  <a class="call-bar tel-link" href="#" data-t="enquire_call"></a>
 
   <script src="assets/js/vendor/gsap.min.js"></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
@@ -323,6 +330,5 @@
   <script src="assets/js/vendor/lenis.min.js"></script>
   <script src="assets/js/content.js"></script>
   <script src="assets/js/site.js"></script>
-  <script type="module" src="assets/js/intro3d.js"></script>
 </body>
 </html>
