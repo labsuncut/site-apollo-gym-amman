@@ -39,7 +39,7 @@ const TEXT = {
       { n: 6, suffix: ' AM', label: 'first session of the day' }
     ],
     space_kicker: '01 · The space', space_title: 'A gym guide', space_text: 'Scroll through the floor. Every corner was built on purpose.',
-    space_hint: 'Drag or scroll sideways',
+    space_hint: 'Swipe, or use the arrows', space_more: 'Explore the full gallery', space_prev: 'Previous photo', space_next: 'Next photo',
     programs_kicker: '02 · Train', programs_title: 'Pick your weapon',
     programs_text: 'Strength, conditioning, combat and classes, all under one roof, with certified trainers in your corner.',
     amenities: ['Cafeteria', 'Lounge', 'Showers', 'Lockers', 'On-site parking', 'Trial classes'],
@@ -91,7 +91,7 @@ const TEXT = {
       { n: 6, suffix: ' ص', label: 'أول تمرين في اليوم' }
     ],
     space_kicker: '٠١ · المكان', space_title: 'جولة في النادي', space_text: 'تصفّح الصالة. كل زاوية بُنيت بقصد.',
-    space_hint: 'اسحب أو مرّر جانبياً',
+    space_hint: 'اسحب، أو استخدم الأسهم', space_more: 'استكشف المعرض كاملاً', space_prev: 'الصورة السابقة', space_next: 'الصورة التالية',
     programs_kicker: '٠٢ · تمرّن', programs_title: 'اختر سلاحك',
     programs_text: 'قوة ولياقة وقتال وحصص جماعية، كلها تحت سقف واحد، مع مدربين معتمدين إلى جانبك.',
     amenities: ['كافتيريا', 'صالة استراحة', 'حمامات', 'خزائن', 'موقف سيارات', 'حصص تجريبية'],
@@ -124,22 +124,32 @@ const TEXT = {
   }
 };
 
-// The gym guide. Photos are frames from Apollo's own Instagram "a gym guide" post (shot by @wassleh.cs).
-// PLACEHOLDER quality: low-res video frames until Apollo sends the originals.
+// ---------- Images ----------
+// Every photo on the site is referenced here, so swapping in Apollo's real photos is a one-file job.
+// `focus` is the CSS object-position (which part survives a crop), w/h reserve space before load.
+// PLACEHOLDER quality: frames from Apollo's own Instagram "a gym guide" post (shot by @wassleh.cs)
+// and one photo Apollo sent, until the originals arrive. See PHOTOS.md for the shot list.
+const IMAGES = {
+  hero: { src: 'assets/img/hero-cardio.webp', w: 1600, h: 998, focus: '50% 45%' },
+  heroPhone: { src: 'assets/img/red-weights.webp', w: 640, h: 882, focus: '50% 30%' },
+  finale: { src: 'assets/img/red-weights.webp', w: 640, h: 882, focus: '50% 40%' }
+};
+// The gym guide. The first `highlights` photos show by default; the rest open with "Explore the full gallery".
+const SPACE_HIGHLIGHTS = 6;
 const SPACE = [
-  { img: 'assets/img/space/reception.webp', en: 'Reception', ar: 'الاستقبال' },
-  { img: 'assets/img/space/open-gym.webp', en: 'Open gym area', ar: 'منطقة التمرين المفتوحة' },
-  { img: 'assets/img/space/free-weights.webp', en: 'Free weights', ar: 'الأوزان الحرة' },
-  { img: 'assets/img/space/cardio.webp', en: 'Cardio area', ar: 'منطقة الكارديو' },
-  { img: 'assets/img/space/calisthenics.webp', en: 'Calisthenics area', ar: 'منطقة الكاليستينكس' },
-  { img: 'assets/img/space/boxing-zone.webp', en: 'Boxing zone', ar: 'منطقة الملاكمة' },
-  { img: 'assets/img/space/chest-area.webp', en: 'Chest area', ar: 'منطقة الصدر' },
-  { img: 'assets/img/space/classroom.webp', en: 'Classroom, lights on', ar: 'قاعة الحصص، الأضواء مضاءة' },
-  { img: 'assets/img/space/classroom-lights-off.webp', en: 'Classroom, lights off', ar: 'قاعة الحصص، الأضواء مطفأة' },
-  { img: 'assets/img/space/cafeteria.webp', en: 'Cafeteria', ar: 'الكافتيريا' },
-  { img: 'assets/img/space/lounge.webp', en: 'Lounge', ar: 'صالة الاستراحة' },
-  { img: 'assets/img/space/chill-area.webp', en: 'Chess & chill area', ar: 'زاوية الشطرنج والاسترخاء' },
-  { img: 'assets/img/space/balcony-view.webp', en: 'Balcony view', ar: 'إطلالة الشرفة' }
+  { img: 'assets/img/space/reception.webp', w: 930, h: 580, focus: '50% 50%', en: 'Reception', ar: 'الاستقبال' },
+  { img: 'assets/img/space/open-gym.webp', w: 930, h: 580, focus: '50% 50%', en: 'Open gym area', ar: 'منطقة التمرين المفتوحة' },
+  { img: 'assets/img/space/free-weights.webp', w: 930, h: 580, focus: '50% 50%', en: 'Free weights', ar: 'الأوزان الحرة' },
+  { img: 'assets/img/space/cardio.webp', w: 930, h: 580, focus: '50% 50%', en: 'Cardio area', ar: 'منطقة الكارديو' },
+  { img: 'assets/img/space/calisthenics.webp', w: 930, h: 580, focus: '50% 50%', en: 'Calisthenics area', ar: 'منطقة الكاليستينكس' },
+  { img: 'assets/img/space/boxing-zone.webp', w: 930, h: 580, focus: '50% 50%', en: 'Boxing zone', ar: 'منطقة الملاكمة' },
+  { img: 'assets/img/space/chest-area.webp', w: 930, h: 580, focus: '50% 50%', en: 'Chest area', ar: 'منطقة الصدر' },
+  { img: 'assets/img/space/classroom.webp', w: 930, h: 580, focus: '50% 50%', en: 'Classroom, lights on', ar: 'قاعة الحصص، الأضواء مضاءة' },
+  { img: 'assets/img/space/classroom-lights-off.webp', w: 930, h: 580, focus: '50% 50%', en: 'Classroom, lights off', ar: 'قاعة الحصص، الأضواء مطفأة' },
+  { img: 'assets/img/space/cafeteria.webp', w: 930, h: 580, focus: '50% 50%', en: 'Cafeteria', ar: 'الكافتيريا' },
+  { img: 'assets/img/space/lounge.webp', w: 930, h: 580, focus: '50% 50%', en: 'Lounge', ar: 'صالة الاستراحة' },
+  { img: 'assets/img/space/chill-area.webp', w: 930, h: 580, focus: '50% 50%', en: 'Chess & chill area', ar: 'زاوية الشطرنج والاسترخاء' },
+  { img: 'assets/img/space/balcony-view.webp', w: 930, h: 580, focus: '50% 50%', en: 'Balcony view', ar: 'إطلالة الشرفة' }
 ];
 
 // Training. Names come from Apollo's site and posts; the one-liners are ours.

@@ -157,7 +157,7 @@ html[lang="ar"] .display { text-transform: none; letter-spacing: 0; line-height:
 
 /* ---------- Marquee ---------- */
 .marquee { overflow: hidden; background: var(--red); color: #fff; padding: 14px 0; transform: rotate(-1.2deg) scale(1.03); position: relative; z-index: 3; }
-.marquee-track { display: flex; gap: 32px; width: max-content; font-family: var(--display); font-weight: 900; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .04em; animation: slide 40s linear infinite; direction: ltr; white-space: nowrap; }
+.marquee-track { display: flex; gap: 32px; width: max-content; font-family: var(--display); font-weight: 900; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .04em; direction: ltr; white-space: nowrap; will-change: transform; }
 html[lang="ar"] .marquee-track { text-transform: none; letter-spacing: 0; }
 .marquee-track i { font-style: normal; opacity: .55; }
 @keyframes slide { to { transform: translateX(-33.333%); } }
@@ -177,14 +177,22 @@ html[lang="ar"] .marquee-track { text-transform: none; letter-spacing: 0; }
 
 /* ---------- Tour ---------- */
 .tour { padding: 80px 0 50px; overflow: hidden; }
-.tour-head { margin-bottom: 28px; }
+.tour-head { margin-bottom: 28px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.tour-nav { display: flex; gap: 10px; flex: none; padding-bottom: 6px; }
+.tour-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: transparent; color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: border-color .2s, background .2s; }
+.tour-btn svg { width: 22px; height: 22px; }
+.tour-btn:hover, .tour-btn:focus-visible { border-color: var(--ink); background: rgba(255,255,255,.06); }
+html[dir="rtl"] .tour-btn svg { transform: scaleX(-1); }
+.tour-more { margin-inline-start: 16px; }
 .tour-head h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
 .tour-head .lead { margin-bottom: 26px; font-size: 1.05rem; }
 .tour-hint { color: var(--muted); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; margin: -20px 0 0; }
 html[lang="ar"] .tour-hint { letter-spacing: 0; }
-.tour-viewport { width: 100%; }
-.tour-track { display: flex; gap: 20px; padding: 0 24px; width: max-content; will-change: transform; }
-.tour-item { position: relative; flex: none; height: clamp(300px, 52vh, 560px); aspect-ratio: 16 / 10; border-radius: var(--radius); overflow: hidden; background: var(--bg2); }
+.tour-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; }
+.tour-viewport::-webkit-scrollbar { display: none; }
+.tour-viewport:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+.tour-track { display: flex; gap: 20px; padding: 0 max(24px, calc((100vw - 1200px) / 2 + 24px)); width: max-content; }
+.tour-item { position: relative; flex: none; height: clamp(300px, 52vh, 560px); aspect-ratio: 16 / 10; scroll-snap-align: start; border-radius: var(--radius); overflow: hidden; background: var(--bg2); }
 .tour-item img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 1.2s var(--ease); }
 .tour-item:hover img { transform: scale(1.02); }
 .tour-item figcaption { position: absolute; left: 22px; right: 22px; bottom: 18px; display: flex; align-items: baseline; gap: 14px; font-weight: 800; font-size: 1.05rem; text-shadow: 0 2px 12px rgba(0,0,0,.7); }
@@ -359,7 +367,7 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 
 /* ---------- Motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track, .scroll-cue i, .live-pulse::before, .nav-live i { animation: none; }
+  .marquee-track, .scroll-cue i, .live-pulse::before, .nav-live i { animation: none; transform: none !important; }
   .loader { display: none; }
   .reveal, .hero-foot > *, .display .line > span, .scroll-cue { opacity: 1; transform: none; }
 }
@@ -390,8 +398,9 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   .section { padding: 80px 0; }
   .stats { padding: 64px 0 24px; }
   .tour { padding: 72px 0 40px; }
-  .tour-viewport { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .tour-viewport::-webkit-scrollbar { display: none; }
+  .tour-head { flex-direction: column; align-items: flex-start; }
+  .tour-progress { flex-wrap: wrap; }
+  .tour-more { margin: 10px 0 0; width: 100%; }
   .tour-track { padding: 0 24px; }
   .tour-item { width: 84vw; height: auto; scroll-snap-align: center; }
   .live-row { grid-template-columns: auto 1fr; }

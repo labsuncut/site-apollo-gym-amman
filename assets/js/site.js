@@ -42,9 +42,18 @@
   // ---------- Stats ----------
   $('#stats-grid').innerHTML = T.stats.map((s) => `<div class="stat reveal"><b><span class="n" data-n="${s.n}" data-dec="${s.dec || 0}">${s.dec ? '0.0' : '0'}</span><span>${esc(s.suffix)}</span></b><p>${esc(s.label)}</p></div>`).join('');
 
-  // ---------- Tour ----------
-  $('#tour-track').innerHTML = SPACE.map((s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" alt="${esc(s[lang])}" loading="${i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`).join('');
-  $('#tour-total').textContent = pad(SPACE.length);
+  // ---------- Images (all paths and focal points live in content.js) ----------
+  const setImg = (el, im) => { if (!el || !im) return; el.src = im.src; el.width = im.w; el.height = im.h; el.style.objectPosition = im.focus; };
+  setImg($('#hero-photo'), IMAGES.hero); setImg($('#final-photo'), IMAGES.finale);
+  if ($('#hero-source')) $('#hero-source').srcset = IMAGES.heroPhone.src;
+
+  // ---------- Gallery: highlights first, the rest on request ----------
+  const tourItem = (s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" width="${s.w}" height="${s.h}" style="object-position:${esc(s.focus)}" alt="${esc(s[lang])}" loading="${i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`;
+  let shown = Math.min(SPACE_HIGHLIGHTS, SPACE.length);
+  $('#tour-track').innerHTML = SPACE.slice(0, shown).map(tourItem).join('');
+  $('#tour-total').textContent = pad(shown);
+  $('#tour-more').hidden = shown >= SPACE.length;
+  $('#tour-prev').setAttribute('aria-label', T.space_prev); $('#tour-next').setAttribute('aria-label', T.space_next);
 
   // ---------- Programs ----------
   $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
@@ -112,6 +121,22 @@
   const header = $('.site-header');
   const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // ---------- Gallery controls: native horizontal scroll, arrows, keyboard, "more" ----------
+  // Vertical scrolling is never captured: the page always continues past the gallery.
+  const track = $('#tour-track'), viewport = $('#tour-viewport'), bar = $('#tour-bar'), idx = $('#tour-index');
+  const step = () => { const it = $('.tour-item'); return it ? it.getBoundingClientRect().width + 20 : 400; };
+  const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(Math.min(shown, Math.round(p * (shown - 1)) + 1)); };
+  viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
+  const go = (n) => viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
+  $('#tour-prev').addEventListener('click', () => go(-1));
+  $('#tour-next').addEventListener('click', () => go(1));
+  viewport.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });
+  $('#tour-more').addEventListener('click', () => {
+    track.insertAdjacentHTML('beforeend', SPACE.slice(shown).map((s, i) => tourItem(s, shown + i)).join(''));
+    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; onSwipe();
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  });
 
   // ---------- No motion: show everything and stop ----------
   if (!motion) {
@@ -227,21 +252,6 @@
     gsap.to(o, { v: n, duration: 1.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' }, onUpdate: () => { el.textContent = o.v.toFixed(dec); } });
   });
 
-  // ---------- Tour: pinned horizontal scroll on desktop, native swipe on phones ----------
-  const track = $('#tour-track'), viewport = $('#tour-viewport'), bar = $('#tour-bar'), idx = $('#tour-index');
-  const setProgress = (p) => { bar.style.transform = `scaleX(${p})`; idx.textContent = pad(Math.min(SPACE.length, Math.round(p * (SPACE.length - 1)) + 1)); };
-  ScrollTrigger.matchMedia({
-    '(min-width: 721px)': () => {
-      const dist = () => track.scrollWidth - viewport.clientWidth;
-      gsap.to(track, { x: () => dir * dist(), ease: 'none', scrollTrigger: { trigger: '#space', start: 'top top+=10', end: () => '+=' + Math.round(dist() * .6), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1, onUpdate: (st) => setProgress(st.progress) } });
-      $$('.tour-item img').forEach((img) => gsap.fromTo(img, { xPercent: dir * -6 }, { xPercent: dir * 6, ease: 'none', scrollTrigger: { trigger: '#space', start: 'top top+=10', end: () => '+=' + Math.round(dist() * .6), scrub: true } }));
-    },
-    '(max-width: 720px)': () => {
-      const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; setProgress(max ? Math.abs(viewport.scrollLeft) / max : 0); };
-      viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
-    }
-  });
-
   // ---------- Program hover thumbnail follows the mouse ----------
   if (window.matchMedia('(hover: hover)').matches) {
     $$('.program').forEach((row) => {
@@ -259,9 +269,16 @@
     gsap.to(card, { scale: .94, opacity: .5, ease: 'none', scrollTrigger: { trigger: all[i + 1], start: 'top 80%', end: 'top 20%', scrub: true } });
   });
 
-  // ---------- Marquee speeds up with scroll velocity ----------
+  // ---------- Slogan strip: slow, steady drift; scrolling nudges it at most 1.4x, eased ----------
+  // Three copies of the words sit in the track, so moving by one third loops with no visible jump.
   const mq = $('#marquee');
-  ScrollTrigger.create({ onUpdate: (st) => { const v = Math.min(4, 1 + Math.abs(st.getVelocity()) / 600); mq.style.animationDuration = `${40 / v}s`; } });
+  const base = isPhone() ? 70 : 110; // seconds per loop (v4 ran 40s and up to 4x faster on scroll)
+  const drift = gsap.to(mq, { xPercent: -100 / 3, duration: base, ease: 'none', repeat: -1 });
+  let speed = 1;
+  ScrollTrigger.create({ onUpdate: (st) => {
+    const target = Math.min(1.4, 1 + Math.abs(st.getVelocity()) / 4000);
+    if (Math.abs(target - speed) > .02) { speed = target; gsap.to(drift, { timeScale: target, duration: .8, ease: 'power1.out', overwrite: true }); }
+  } });
 
   addEventListener('load', () => ScrollTrigger.refresh());
 })();

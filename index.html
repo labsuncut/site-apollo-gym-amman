@@ -119,8 +119,8 @@
       <div class="hero-bg" aria-hidden="true">
         <!-- PLACEHOLDER image: frame from Apollo's own Instagram gym guide -->
         <picture>
-          <source media="(max-width: 720px)" srcset="assets/img/red-weights.webp">
-          <img class="hero-photo" src="assets/img/hero-cardio.webp" alt="" fetchpriority="high">
+          <source media="(max-width: 720px)" srcset="assets/img/red-weights.webp" id="hero-source">
+          <img class="hero-photo" id="hero-photo" src="assets/img/hero-cardio.webp" width="1600" height="998" alt="" fetchpriority="high">
         </picture>
         <div class="hero-shade"></div>
         <div class="sun" id="sun"></div>
@@ -156,15 +156,21 @@
     <!-- THE SPACE: horizontal tour -->
     <section class="tour" id="space">
       <div class="tour-head wrap">
-        <p class="kicker" data-t="space_kicker"></p>
-        <h2 class="split" data-t="space_title"></h2>
-        <p class="lead" data-t="space_text"></p>
-        <p class="tour-hint" data-t="space_hint"></p>
+        <div>
+          <p class="kicker" data-t="space_kicker"></p>
+          <h2 class="split" data-t="space_title"></h2>
+          <p class="lead" data-t="space_text"></p>
+          <p class="tour-hint" data-t="space_hint"></p>
+        </div>
+        <div class="tour-nav">
+          <button class="tour-btn" id="tour-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="tour-btn" id="tour-next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
       </div>
-      <div class="tour-viewport" id="tour-viewport">
+      <div class="tour-viewport" id="tour-viewport" tabindex="0" aria-roledescription="carousel">
         <div class="tour-track" id="tour-track"></div>
       </div>
-      <div class="tour-progress wrap"><span id="tour-index">01</span><i><b id="tour-bar"></b></i><span id="tour-total"></span></div>
+      <div class="tour-progress wrap"><span id="tour-index">01</span><i><b id="tour-bar"></b></i><span id="tour-total"></span><button class="btn btn-ghost btn-small tour-more" id="tour-more" type="button" data-t="space_more"></button></div>
     </section>
 
     <!-- PROGRAMS -->
@@ -290,7 +296,7 @@
 
     <!-- FINAL -->
     <section class="final" id="final">
-      <img class="final-photo" src="assets/img/red-weights.webp" alt="" loading="lazy">
+      <img class="final-photo" id="final-photo" src="assets/img/red-weights.webp" width="640" height="882" alt="" loading="lazy">
       <div class="final-sun" aria-hidden="true"></div>
       <div class="wrap final-inner">
         <p class="final-word split" data-t="final_word"></p>
