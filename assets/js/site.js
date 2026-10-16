@@ -10,6 +10,8 @@
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
   const motion = !calm && window.gsap;
+  // Once per visit: remember in sessionStorage (cleared when the tab closes). If storage is blocked, the intro simply plays.
+  const introSeen = () => { try { const v = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); return v; } catch (e) { return false; } };
   const pad = (n) => String(n).padStart(2, '0');
   const dir = rtl ? 1 : -1;
 
@@ -149,9 +151,10 @@
     $$('.reveal, .hero-foot > *, .scroll-cue').forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
     $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; el.style.opacity = 1; });
     $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
-    // Reduced motion: the lit symbol held still, then a plain dissolve into the page.
     const ld = $('#loader');
-    { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1100); }
+    // Reduced motion: the lit rooftop holds as a still, then dissolves. Still once per visit.
+    if (introSeen()) ld.remove();
+    else { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1400); }
     $('#tour-bar').style.transform = 'none';
     $('#timeline-fill').style.transform = 'none';
     return;
@@ -179,14 +182,14 @@
     gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
 
-  // ---------- Intro: Apollo's signal comes alive ----------
-  // An authored brightness curve (0 = dark, 1 = fully lit) drives three light layers:
-  // the lit mark, a tight halo, and a soft ambient spill that lags a little behind.
+  // ---------- Intro: the Apollo beacon on the roof ----------
+  // An authored brightness curve (0 = dark, 1 = fully lit) drives the light layers of a night rooftop scene:
+  // the lit sign face, a tight halo, and the red light spilling onto the frame and concrete, which lags a little.
   // Story: dormant / first weak cluster that fades / dark pause / stronger second cluster
-  // with one soft dip / smooth activation / steady hold / dissolve into the homepage.
+  // with one soft dip / smooth activation / steady hold / the whole scene dissolves into the homepage.
   const loader = $('#loader');
-  // The signal plays on every load, refresh included (team decision 2026-10-16).
-  const seen = false;
+  // The beacon plays once per visit (team decision 2026-10-16): a refresh or a language switch goes straight to the homepage.
+  const seen = introSeen();
   const finishIntro = () => { if (loader.isConnected) loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
   const heroIn = (tl, at) => tl
     .to('.display .line > span', { y: 0, opacity: 1, duration: .9, ease: 'power2.out', stagger: .08 }, at)
@@ -197,17 +200,16 @@
     heroIn(gsap.timeline(), 0);
     lenis.start();
   } else {
-    const lit = $('.signal-lit'), halo = $('.signal-halo'), spill = $('.signal-spill'), dim = $('.signal-dim');
+    const lit = $('.beacon-on'), halo = $('.beacon-halo'), spill = $('.beacon-spill');
     const L = { v: 0, s: 0 };
     const paint = () => {
-      L.s += (L.v - L.s) * .22;                      // the spill follows softly
+      L.s += (L.v - L.s) * .22;                      // the spill follows softly and decays a touch slower
       lit.style.opacity = L.v;
-      halo.style.opacity = Math.pow(L.v, 1.6) * .9;  // the halo only really appears once the core is bright
-      spill.style.opacity = Math.pow(L.s, 1.2) * .85;
-      dim.style.opacity = 1 - L.v * .6;
+      halo.style.opacity = Math.pow(L.v, 1.6);       // the halo only really appears once the face is bright
+      spill.style.opacity = Math.pow(L.s, 1.2);
     };
-    const intro = gsap.timeline({ onUpdate: paint, onComplete: finishIntro });
-    // Each step: brightness target, duration. Unequal lengths and peaks on purpose.
+    const intro = gsap.timeline({ paused: true, onUpdate: paint, onComplete: finishIntro });
+    // Each step: brightness target, duration, ease. Unequal lengths and peaks on purpose; never more than 3 flashes a second.
     const steps = [
       // 0.00-0.35 dormant
       [0, .35, 'none'],
@@ -219,25 +221,33 @@
       [.56, .08, 'power1.out'], [.3, .09, 'power1.in'], [.82, .1, 'power1.out'], [.64, .08, 'power1.inOut'], [.9, .25, 'power1.out'], [.46, .15, 'power1.inOut'], [.7, .15, 'power1.out'],
       // 2.45-3.05 activation
       [1, .6, 'power2.out'],
-      // 3.05-3.45 steady hold
-      [1, .4, 'none']
+      // 3.05-3.55 steady hold
+      [1, .5, 'none']
     ];
     steps.forEach(([v, d, e]) => intro.to(L, { v, duration: d, ease: e }));
-    // 3.45-4.15 arrival: the dark dissolves into the hero, the signal fades, the words rise.
+    // 3.55-4.35 arrival: the rooftop dissolves into the hero and the words rise.
     intro
       .to('.loader-skip', { opacity: 1, duration: .4 }, .2)
-      .to('.signal-bg', { opacity: 0, duration: .7, ease: 'power1.inOut' }, 3.45)
-      .to('.signal', { opacity: 0, duration: .45, ease: 'power1.in' }, 3.55)
-      .to('.signal-spill', { opacity: 0, duration: .5, ease: 'power1.in', onComplete: () => { spill.style.opacity = 0; } }, 3.65)
       .to('.loader-skip', { opacity: 0, duration: .3 }, 3.5)
-      .add(finishIntro, 4.15);
-    heroIn(intro, 3.6);
+      .to('.beacon', { opacity: 0, duration: .8, ease: 'power1.inOut' }, 3.55)
+      .to(loader, { backgroundColor: 'rgba(8,8,10,0)', duration: .6, ease: 'power1.inOut' }, 3.6)
+      .add(finishIntro, 4.35);
+    heroIn(intro, 3.7);
     window.apolloIntro = intro;
     const skip = () => { if (intro.progress() < 1) intro.progress(1); };
     $('#loader-skip').addEventListener('click', skip);
     addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') skip(); }, { once: true });
+    // Start only once the rooftop and the lit face are decoded, so the first frame is the scene, not a blank.
+    // If an image fails or is slow, the intro still runs (or opens the site) rather than trapping anyone.
+    const plates = [$('#beacon-roof'), $('#beacon-on')];
+    let started = false;
+    const start = () => { if (!started) { started = true; intro.play(); } };
+    const broken = () => { started = true; intro.progress(1); };
+    plates.forEach((img) => { if (img.complete && !img.naturalWidth) broken(); else img.addEventListener('error', broken); });
+    Promise.all(plates.map((img) => img.decode().catch(() => {}))).then(start);
+    setTimeout(start, 1800);
     // Safety: nothing may block the site. If the timeline never completes, open anyway.
-    setTimeout(finishIntro, 7000);
+    setTimeout(finishIntro, 8000);
   }
 
   // ---------- Hero: the sun rises, the photo drifts ----------

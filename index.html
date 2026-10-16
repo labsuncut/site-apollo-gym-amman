@@ -11,6 +11,9 @@
   <meta name="theme-color" content="#0a0a0b">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/montserrat-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/intro/roof-desk.webp" as="image" media="(orientation: landscape)">
+  <link rel="preload" href="assets/img/intro/roof-phone.webp" as="image" media="(orientation: portrait)">
+  <link rel="preload" href="assets/img/hero-cardio.webp" as="image" media="(min-width: 721px)">
   <link rel="stylesheet" href="assets/css/site.css">
   <!-- Remembers the visitor's language before the page paints, so there is no flash. -->
   <script>
@@ -51,14 +54,14 @@
     </symbol>
   </svg>
 
-  <!-- Intro: Apollo's signal comes alive. The unlit mark sits in the dark, flickers in clusters, catches, holds, then the homepage dissolves in behind it -->
+  <!-- Intro: the Apollo beacon on the roof. A night rooftop with the sign unlit; it flickers in clusters, catches, holds, then the homepage dissolves in. Rooftop plate is a composited scene, not Apollo's building -->
   <div class="loader" id="loader">
-    <div class="signal-bg" aria-hidden="true"></div>
-    <div class="signal-spill" aria-hidden="true"></div>
-    <div class="signal" aria-hidden="true">
-      <svg class="signal-dim" viewBox="0 0 100 100"><use href="#mark"/></svg>
-      <svg class="signal-halo" viewBox="0 0 100 100"><use href="#mark"/></svg>
-      <svg class="signal-lit" viewBox="0 0 100 100"><use href="#mark"/></svg>
+    <div class="beacon" aria-hidden="true">
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/roof-phone.webp"><img class="beacon-roof" id="beacon-roof" src="assets/img/intro/roof-desk.webp" alt="" fetchpriority="high" decoding="async"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-off-phone.png"><img class="beacon-off" src="assets/img/intro/sign-off-desk.png" alt="" decoding="async"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/spill-phone.png"><img class="beacon-spill" src="assets/img/intro/spill-desk.png" alt="" decoding="async"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-halo-phone.png"><img class="beacon-halo" src="assets/img/intro/sign-halo-desk.png" alt="" decoding="async"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-on-phone.png"><img class="beacon-on" id="beacon-on" src="assets/img/intro/sign-on-desk.png" alt="" fetchpriority="high" decoding="async"></picture>
     </div>
     <button class="loader-skip" id="loader-skip" type="button" data-t="loader_skip"></button>
   </div>

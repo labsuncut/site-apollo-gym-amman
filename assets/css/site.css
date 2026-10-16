@@ -50,17 +50,15 @@ html[lang="ar"] .kicker { letter-spacing: 0; }
 html[lang="ar"] .eyebrow { letter-spacing: 0; }
 .ico { width: 20px; height: 20px; fill: currentColor; }
 
-/* ---------- Loader: Apollo's signal in the dark ---------- */
-.loader { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: transparent; }
+/* ---------- Loader: the Apollo beacon on the roof ---------- */
+/* Five full-frame image layers share one crop so they stay registered: rooftop plate (static), unlit sign,
+   red light reflected onto the structure, a tight halo, and the lit face. The script fades the last four. */
+.loader { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: #08080a; }
 html:not(.js) .loader { display: none; }
-.signal-bg { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 46%, #141416 0%, #0d0d0f 45%, #08080a 100%); }
-.signal-bg::after { content: ""; position: absolute; inset: 0; opacity: .05; mix-blend-mode: overlay; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.signal-spill { position: absolute; left: 50%; top: 46%; width: min(140vw, 1400px); height: min(140vw, 1400px); transform: translate(-50%, -50%); background: radial-gradient(circle at center, rgba(212,31,44,.30) 0%, rgba(212,31,44,.12) 22%, rgba(212,31,44,.03) 42%, transparent 60%); opacity: 0; pointer-events: none; }
-.signal { position: absolute; left: 50%; top: 46%; width: clamp(150px, 20vw, 250px); aspect-ratio: 1; transform: translate(-50%, -50%); }
-.signal svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.signal-dim { fill: #17171a; }
-.signal-halo { fill: #ff3a48; filter: blur(7px); transform: scale(1.03); opacity: 0; }
-.signal-lit { fill: #e8232f; filter: drop-shadow(0 0 2px rgba(255,120,130,.6)); opacity: 0; }
+.beacon { position: absolute; inset: 0; }
+.beacon picture, .beacon img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.beacon img { object-fit: cover; object-position: 50% 50%; display: block; }
+.beacon-on, .beacon-halo, .beacon-spill { opacity: 0; }
 .loader-skip { position: absolute; inset-inline-end: max(20px, env(safe-area-inset-right)); bottom: max(22px, calc(env(safe-area-inset-bottom) + 14px)); margin: 0; z-index: 8; opacity: 0; font: inherit; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #fff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 12px 20px; cursor: pointer; }
 .loader-skip:hover, .loader-skip:focus-visible { background: rgba(255,255,255,.16); outline: none; border-color: rgba(255,255,255,.6); }
 html[lang="ar"] .loader-skip { letter-spacing: 0; font-size: .95rem; }
@@ -350,10 +348,9 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 /* ---------- Motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
   .marquee-track, .scroll-cue i, .live-pulse::before, .nav-live i { animation: none; transform: none !important; }
-  .signal-lit, .loader-skip { opacity: 1; }
-  .signal-halo { opacity: .8; }
-  .signal-spill { opacity: .6; }
-  .signal-dim { opacity: .4; }
+  .beacon-on, .loader-skip { opacity: 1; }
+  .beacon-halo { opacity: .9; }
+  .beacon-spill { opacity: .85; }
   .reveal, .hero-foot > *, .display .line > span, .scroll-cue { opacity: 1; transform: none; }
 }
 
@@ -396,8 +393,6 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   .enquire { padding: 28px 22px; }
   .family-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 24px; }
   .family-media { aspect-ratio: 16 / 10; }
-  .signal { width: 44vw; top: 42%; }
-  .signal-spill { top: 42%; width: 180vw; height: 180vw; }
   .loader-skip { bottom: calc(env(safe-area-inset-bottom) + 88px); inset-inline-end: 16px; }
   .timeline { grid-template-columns: 1fr; gap: 36px; padding-top: 0; padding-inline-start: 28px; }
   .timeline-line { top: 0; bottom: 0; left: auto; inset-inline-start: 5px; width: 2px; height: auto; right: auto; }
