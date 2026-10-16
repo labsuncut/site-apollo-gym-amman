@@ -243,7 +243,6 @@
   // ---------- Hero: the sun rises, the photo drifts ----------
   gsap.to('#sun', { yPercent: -45, scale: 1.25, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.hero-photo', { yPercent: 12, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
-  gsap.to('.hero-word', { yPercent: 40, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.final-sun', { yPercent: -25, scale: 1.15, ease: 'none', scrollTrigger: { trigger: '#final', start: 'top bottom', end: 'bottom top', scrub: true } });
 
   // ---------- Stats count up ----------

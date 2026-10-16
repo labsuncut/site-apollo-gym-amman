@@ -24,7 +24,7 @@ const TEXT = {
     nav_space: 'The space', nav_programs: 'Train', nav_story: 'Story', nav_members: 'Members', nav_plans: 'Membership', nav_visit: 'Visit', nav_faq: 'FAQ', nav_franchise: 'Franchise', nav_live: 'Live',
     nav_family: 'Family', nav_cta: 'Call Apollo',
     loader_skip: 'Skip intro',
-    hero_eyebrow: 'Apollo Training Facility · Mecca Street, Amman',
+    hero_eyebrow: 'Mecca Street, Amman',
     hero_l1: 'Rule your', hero_l2: 'destiny.', hero_l3: 'Defy the', hero_l4: 'limits.',
     hero_sub: 'A training community in Amman. 840 square metres of iron and turf, and the best people you will meet in a gym. Open from 6 AM.',
     cta_tour: 'Book your tour', cta_space: 'See the space',
@@ -82,7 +82,7 @@ const TEXT = {
     nav_space: 'المكان', nav_programs: 'تمرّن', nav_story: 'القصة', nav_members: 'الأعضاء', nav_plans: 'الاشتراكات', nav_visit: 'زورونا', nav_faq: 'الأسئلة', nav_franchise: 'الامتياز', nav_live: 'مباشر',
     nav_family: 'العائلة', nav_cta: 'اتصل بأبولو',
     loader_skip: 'تخطَّ المقدمة',
-    hero_eyebrow: 'أبولو للتدريب · شارع مكة، عمّان',
+    hero_eyebrow: 'شارع مكة، عمّان',
     hero_l1: 'تحكّم', hero_l2: 'بمصيرك.', hero_l3: 'تحدَّ', hero_l4: 'الحدود.',
     hero_sub: 'مجتمع تدريب في عمّان. ٨٤٠ متراً مربعاً من الحديد والعشب، وأطيب ناس ممكن تقابلهم في نادي. نفتح من الساعة ٦ صباحاً.',
     cta_tour: 'احجز جولتك', cta_space: 'شاهد المكان',
@@ -142,7 +142,7 @@ const TEXT = {
 // PLACEHOLDER quality: frames from Apollo's own Instagram "a gym guide" post (shot by @wassleh.cs)
 // and one photo Apollo sent, until the originals arrive. See PHOTOS.md for the shot list.
 const IMAGES = {
-  hero: { src: 'assets/img/hero-cardio.webp', w: 1600, h: 998, focus: '50% 45%' },
+  hero: { src: 'assets/img/hero-cardio.webp', w: 1860, h: 1160, focus: '50% 45%' },
   heroPhone: { src: 'assets/img/red-weights.webp', w: 640, h: 882, focus: '50% 30%' },
   finale: { src: 'assets/img/red-weights.webp', w: 640, h: 882, focus: '50% 40%' }
 };
