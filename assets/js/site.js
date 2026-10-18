@@ -219,10 +219,22 @@
   // ---------- Gallery controls: native horizontal scroll, arrows, keyboard, "more" ----------
   // Vertical scrolling is never captured: the page always continues past the gallery.
   const track = $('#tour-track'), viewport = $('#tour-viewport'), bar = $('#tour-bar'), idx = $('#tour-index');
-  const step = () => { const it = $('.tour-item'); return it ? it.getBoundingClientRect().width + 20 : 400; };
-  const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(Math.min(shown, Math.round(p * (shown - 1)) + 1)); };
+  // Distance between two neighbouring photos (width + gap + margins), so arrows and the counter move exactly one photo.
+  const step = () => { const [a, b] = $$('.tour-item'); return a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; };
+  const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(p > .98 ? shown : Math.min(shown, Math.round(Math.abs(viewport.scrollLeft) / step()) + 1)); };
   viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
   const go = (n) => viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
+  // Phones: any clear sideways swipe moves exactly one photo, even a short one (native snap alone needs a long drag).
+  let touch = null;
+  const current = () => Math.round(Math.abs(viewport.scrollLeft) / step());
+  viewport.addEventListener('touchstart', (e) => { const p = e.touches[0]; touch = { x: p.clientX, y: p.clientY, i: current() }; }, { passive: true });
+  viewport.addEventListener('touchend', (e) => {
+    if (!touch) return; const p = e.changedTouches[0]; const dx = p.clientX - touch.x, dy = p.clientY - touch.y; const from = touch.i; touch = null;
+    if (Math.abs(dx) < 30 || Math.abs(dx) < Math.abs(dy)) return;
+    const forward = rtl ? dx > 0 : dx < 0;
+    const to = Math.max(0, Math.min(shown - 1, from + (forward ? 1 : -1)));
+    viewport.scrollTo({ left: to * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
+  }, { passive: true });
   $('#tour-prev').addEventListener('click', () => go(-1));
   $('#tour-next').addEventListener('click', () => go(1));
   viewport.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });

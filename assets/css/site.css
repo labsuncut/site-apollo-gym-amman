@@ -439,7 +439,10 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   .tour-progress { flex-wrap: wrap; }
   .tour-more { margin: 10px 0 0; width: 100%; }
   .tour-track { padding: 0 24px; }
-  .tour-item { width: 84vw; height: auto; scroll-snap-align: center; }
+  /* Phones: one swipe = one photo. Mandatory snap + snap-stop means a flick never skips or stalls between photos. */
+  .tour-viewport { scroll-snap-type: x mandatory; scroll-padding-inline: 24px; }
+  .tour-track { gap: 12px; }
+  .tour-item { width: calc(100vw - 48px); height: auto; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; }
   .live-row { grid-template-columns: 1fr; gap: 16px; padding: 36px 0; }
   .live-pulse { display: none; }
   .live-copy p { font-size: .95rem; }
