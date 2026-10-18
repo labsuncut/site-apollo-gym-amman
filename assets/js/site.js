@@ -223,49 +223,87 @@
   const step = () => { const [a, b] = $$('.tour-item'); return a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; };
   const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(p > .98 ? shown : Math.min(shown, Math.round(Math.abs(viewport.scrollLeft) / step()) + 1)); };
   viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
-  // Touch screens: the gallery is a true slider, not a scroll box. The track follows the finger,
-  // and on release any small swipe glides to the next (or previous) full photo. Never half a photo.
+  // Touch screens: the gallery is a true slider, not a scroll box. The track follows the finger 1:1,
+  // and on release a spring carries the finger's own speed into the next full photo, so the hand-off
+  // never jumps or brakes. Photos drift slightly inside their frames (parallax) so each one slides
+  // into place under the next like interlocking pieces. Never half a photo.
   const slider = window.matchMedia('(pointer: coarse)').matches;
-  let at = 0; // index of the photo in view (slider mode)
-  const maxShift = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
-  const shiftFor = (i) => Math.min(i * step(), maxShift());
-  const place = (px, animate) => {
-    track.style.transition = animate && !calm ? 'transform .42s cubic-bezier(.2,.8,.2,1)' : 'none';
-    track.style.transform = `translate3d(${rtl ? px : -px}px,0,0)`;
+  let at = 0, pos = 0, vel = 0, target = 0, raf = 0, gap = 0, max = 0, imgs = [];
+  const measure = () => { gap = step(); max = Math.max(0, track.scrollWidth - viewport.clientWidth); imgs = $$('.tour-item img', track); };
+  const shiftFor = (i) => Math.min(i * gap, max);
+  const paint = () => {
+    track.style.transform = `translate3d(${rtl ? pos : -pos}px,0,0)`;
+    if (calm) return;
+    for (let i = 0; i < imgs.length; i++) { // image lags its frame by 18%: depth without extra motion
+      const d = (i * gap - pos) / (gap || 1); if (d < -1.5 || d > 1.5) continue;
+      imgs[i].style.transform = `translate3d(${(rtl ? 1 : -1) * d * gap * 0.18}px,0,0) scale(1.2)`;
+    }
+  };
+  // Release glide: starts at exactly the finger's speed (no jolt), picks up early, and lands softly
+  // with a short tail. Blend of two curves, both ending at zero speed, chosen so the start speed matches.
+  const settle = () => {
+    cancelAnimationFrame(raf);
+    const x0 = pos, dist = target - x0;
+    if (Math.abs(dist) < 0.5) { pos = target; vel = 0; paint(); return; }
+    const D = Math.max(300, Math.min(560, 280 + Math.abs(dist) * 0.75)); // ms, longer for longer trips
+    const r = Math.max(0, Math.min(3, (vel * D) / dist)); // start slope in curve units (only toward target)
+    const E = (u) => { const m = 1 - u; const soft = 1 - m * m * m * (1 + 3 * u), out = 1 - m * m * m; return (1 - r / 3) * soft + (r / 3) * out; };
+    const dE = (u) => { const m = 1 - u; return (1 - r / 3) * 12 * u * m * m + (r / 3) * 3 * m * m; };
+    const t0 = performance.now();
+    const tick = (now) => {
+      const u = Math.min(1, (now - t0) / D);
+      pos = x0 + dist * E(u); vel = (dist * dE(u)) / D;
+      paint();
+      if (u < 1) raf = requestAnimationFrame(tick); else { pos = target; vel = 0; }
+    };
+    raf = requestAnimationFrame(tick);
   };
   const showAt = (i, animate = true) => {
-    at = Math.max(0, Math.min(shown - 1, i)); place(shiftFor(at), animate);
+    at = Math.max(0, Math.min(shown - 1, i)); target = shiftFor(at);
     bar.style.transform = `scaleX(${shown > 1 ? at / (shown - 1) : 0})`; idx.textContent = pad(at + 1);
+    if (animate && !calm) settle(); else { cancelAnimationFrame(raf); pos = target; vel = 0; paint(); }
   };
   const go = (n) => slider ? showAt(at + n) : viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
   if (slider) {
     viewport.classList.add('is-slider');
+    $$('.tour-item img', track).forEach((im) => { im.loading = 'eager'; });
     let t = null;
-    viewport.addEventListener('touchstart', (e) => { const p = e.touches[0]; t = { x: p.clientX, y: p.clientY, time: Date.now(), dir: 0 }; track.style.transition = 'none'; }, { passive: true });
+    viewport.addEventListener('touchstart', (e) => {
+      cancelAnimationFrame(raf); measure(); // catch a photo mid-glide exactly where it is
+      const p = e.touches[0]; t = { x: p.clientX, y: p.clientY, from: pos, dir: 0, samples: [[performance.now(), p.clientX]] };
+      vel = 0;
+    }, { passive: true });
     viewport.addEventListener('touchmove', (e) => {
       if (!t) return; const p = e.touches[0]; const dx = p.clientX - t.x, dy = p.clientY - t.y;
-      if (!t.dir) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; t.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
+      if (!t.dir) { if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return; t.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
       if (t.dir !== 'x') return;
       e.preventDefault();
-      let shift = shiftFor(at) - (rtl ? -dx : dx);
-      if (shift < 0 || shift > maxShift()) shift = shift < 0 ? shift / 3 : maxShift() + (shift - maxShift()) / 3; // soft edges
-      place(shift, false); t.dx = dx;
+      const now = performance.now(); t.samples.push([now, p.clientX]); while (t.samples.length > 2 && now - t.samples[0][0] > 90) t.samples.shift();
+      let next = t.from - (rtl ? -(p.clientX - t.x) : (p.clientX - t.x));
+      if (next < 0) next /= 3; else if (next > max) next = max + (next - max) / 3; // soft edges
+      pos = next; paint();
     }, { passive: false });
     const release = () => {
-      if (!t) return; const dx = t.dir === 'x' ? (t.dx || 0) : 0; const fast = Math.abs(dx) / Math.max(1, Date.now() - t.time) > .25; t = null;
-      if (Math.abs(dx) > 18 || (fast && Math.abs(dx) > 6)) showAt(at + ((rtl ? dx > 0 : dx < 0) ? 1 : -1)); else showAt(at);
+      if (!t) return; const s = t.samples, a = s[0], b = s[s.length - 1]; const dir = t.dir; t = null;
+      if (dir !== 'x') { showAt(at); return; }
+      const fingerV = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0; // px per ms, screen direction
+      vel = rtl ? fingerV : -fingerV; // track velocity in "pos" units
+      const moved = pos - shiftFor(at);
+      let to = at;
+      if (Math.abs(moved) > 12 || Math.abs(vel) > 0.2) to = at + ((Math.abs(vel) > 0.2 ? vel : moved) > 0 ? 1 : -1);
+      showAt(to);
     };
     viewport.addEventListener('touchend', release, { passive: true });
     viewport.addEventListener('touchcancel', release, { passive: true });
-    addEventListener('resize', () => showAt(at, false), { passive: true });
-    showAt(0, false);
+    addEventListener('resize', () => { measure(); showAt(at, false); }, { passive: true });
+    measure(); showAt(0, false);
   }
   $('#tour-prev').addEventListener('click', () => go(-1));
   $('#tour-next').addEventListener('click', () => go(1));
   viewport.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });
   $('#tour-more').addEventListener('click', () => {
     track.insertAdjacentHTML('beforeend', SPACE.slice(shown).map((s, i) => tourItem(s, shown + i)).join(''));
-    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; slider ? showAt(at, false) : onSwipe();
+    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; slider ? (measure(), $$('.tour-item img', track).forEach((im) => { im.loading = 'eager'; }), showAt(at, false)) : onSwipe();
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
 
