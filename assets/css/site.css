@@ -249,6 +249,40 @@ html[dir="rtl"] .timeline-line b { transform-origin: right; }
 html[lang="ar"] .milestone h3 { text-transform: none; letter-spacing: 0; font-size: 1rem; }
 .milestone p { margin: 0; color: var(--muted); font-size: .98rem; }
 
+/* ---------- Apollo's arrow (story) ----------
+   A bow sits at the start of the line. When the story comes into view the string draws back,
+   the arrow flies along the line (the red line is its trail), each year lights as it passes,
+   and it strikes a target on the last year. Phones: the arrow rides down the line as you scroll. */
+.timeline.has-bow { padding-top: 84px; padding-inline-start: 140px; min-width: max(100%, calc(var(--n, 4) * 252px + 112px)); } /* the grid overflows otherwise and the line stops short */
+.timeline.has-bow .timeline-line { top: 47px; inset-inline-start: 40px; }
+.timeline.has-bow .archer { scroll-snap-align: start; }
+.timeline.has-bow .milestone::before { top: -42px; transition: transform .5s var(--ease), box-shadow .5s var(--ease), background .3s; }
+.timeline.has-bow .milestone b { transition: color .6s var(--ease), opacity .6s var(--ease); }
+.timeline.arrow-ready .milestone:not(.lit) b { opacity: .28; }
+.timeline.arrow-ready .milestone:not(.lit)::before { background: #3a3a3e; }
+.timeline .milestone.lit::before { animation: ms-ignite .7s var(--ease); box-shadow: 0 0 0 6px var(--bg), 0 0 18px 2px rgba(255,45,63,.55); }
+@keyframes ms-ignite { 0% { transform: scale(1); } 35% { transform: scale(1.9); } 100% { transform: scale(1); } }
+.archer { position: absolute; top: 0; inset-inline-start: 0; width: 60px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; z-index: 3; color: var(--ink); -webkit-tap-highlight-color: transparent; }
+.archer svg { width: 100%; height: 100%; overflow: visible; }
+html[dir="rtl"] .archer svg { transform: scaleX(-1); }
+.archer:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; border-radius: 8px; }
+.bow-limb { fill: none; stroke: url(#bow-metal); stroke-width: 4.2; stroke-linecap: round; }
+.bow-grip { fill: var(--red); }
+.bow-string { fill: none; stroke: rgba(244,242,239,.85); stroke-width: 1.1; }
+.arrow-fly { position: absolute; top: 38px; inset-inline-start: 0; width: 110px; height: 20px; z-index: 5; pointer-events: none; will-change: transform; }
+.arrow-fly svg { width: 100%; height: 100%; overflow: visible; transform-origin: 100% 50%; }
+html[dir="rtl"] .arrow-fly svg { transform: scaleX(-1); transform-origin: 50% 50%; }
+.arrow-trail { position: absolute; top: 46px; height: 4px; width: 160px; inset-inline-start: 0; pointer-events: none; opacity: 0; background: linear-gradient(to right, transparent, rgba(255,45,63,.9)); filter: blur(2px); border-radius: 4px; will-change: transform, opacity; }
+html[dir="rtl"] .arrow-trail { background: linear-gradient(to left, transparent, rgba(255,45,63,.9)); }
+/* the last year becomes a target */
+.timeline.has-bow .milestone.is-target::before { width: 34px; height: 34px; top: -53px; inset-inline-start: -11px; background: radial-gradient(circle, var(--neon) 0 18%, var(--bg) 19% 33%, var(--red) 34% 52%, var(--bg) 53% 67%, #c9c5bf 68% 100%); box-shadow: 0 0 0 4px var(--bg); }
+.timeline.arrow-ready .milestone.is-target:not(.lit)::before { filter: grayscale(1) brightness(.55); }
+.milestone.is-target.lit::before { animation: target-thud .6s var(--ease); box-shadow: 0 0 0 4px var(--bg), 0 0 30px 6px rgba(255,45,63,.6); }
+@keyframes target-thud { 0% { transform: scale(1); } 20% { transform: scale(1.22) translateX(3px); } 45% { transform: scale(.94); } 100% { transform: scale(1); } }
+.milestone.is-target::after { content: ''; position: absolute; top: -53px; inset-inline-start: -11px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--neon); opacity: 0; pointer-events: none; }
+.milestone.is-target.hit::after { animation: target-ripple 1.1s var(--ease) forwards; }
+@keyframes target-ripple { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(3.2); } }
+
 /* ---------- Apollo Live bubble + panel ---------- */
 .live-bubble { position: fixed; z-index: 35; inset-inline-start: 20px; bottom: max(20px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(14,14,16,.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #fff; font: inherit; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .3s var(--ease), border-color .2s; }
 .live-bubble:hover, .live-bubble:focus-visible { transform: translateY(-2px); border-color: rgba(255,45,63,.6); outline: none; }
@@ -426,7 +460,6 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   .program.is-active h3 { transform: none; }
   .visit-grid { grid-template-columns: 1fr; }
   .membership-grid { grid-template-columns: 1fr; }
-  .timeline { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 720px) {
   :root { --header: 64px; }
@@ -474,6 +507,17 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   .timeline-line { top: 0; bottom: 0; left: auto; inset-inline-start: 5px; width: 2px; height: auto; right: auto; }
   .timeline-line b { transform: scaleY(0); transform-origin: top; }
   .milestone::before { top: 10px; inset-inline-start: -28px; }
+  .timeline.has-bow { padding-top: 150px; padding-inline-start: 40px; min-width: 0; }
+  .timeline.has-bow .timeline-line { top: 60px; bottom: 0; left: auto; right: auto; inset-inline-start: 17px; width: 2px; height: auto; }
+  .timeline.has-bow .milestone::before { top: 10px; inset-inline-start: -28px; }
+  .timeline.has-bow .milestone.is-target::before { top: -1px; inset-inline-start: -39px; }
+  .milestone.is-target::after { top: -1px; inset-inline-start: -39px; }
+  .archer { width: 96px; height: 60px; inset-inline-start: -30px; }
+  .archer svg, html[dir="rtl"] .archer svg { position: absolute; left: 18px; top: -18px; width: 60px; height: 96px; transform: rotate(90deg); transform-origin: 50% 50%; }
+  .arrow-fly { top: 0; inset-inline-start: 8px; width: 20px; height: 110px; }
+  .archer { pointer-events: none; }
+  .arrow-fly svg, html[dir="rtl"] .arrow-fly svg { position: absolute; left: -45px; top: 45px; width: 110px; height: 20px; transform: rotate(90deg); transform-origin: 50% 50%; }
+  .arrow-trail { display: none; }
   .final { padding: 100px 0 90px; }
   .hero-photo { filter: none; opacity: .8; object-position: 50% 30%; }
   .footer-row { flex-direction: column; align-items: flex-start; }

@@ -93,6 +93,43 @@
     return `<div class="milestone reveal"><b>${esc(s.y)}</b><h3>${esc(title)}</h3><p>${esc(text)}</p></div>`;
   }).join(''));
 
+  // Apollo's arrow: a bow at the start of the story line. Built here in its finished state (arrow in the
+  // target, every year lit) so it is complete without motion; the motion section below replays it.
+  const quiver = (() => {
+    const tl = $('#timeline'), fill = $('#timeline-fill');
+    tl.classList.add('has-bow');
+    const ms = $$('.milestone', tl); ms[ms.length - 1].classList.add('is-target'); ms[0].style.scrollSnapAlign = 'none'; // the bow is the first stop
+    tl.insertAdjacentHTML('afterbegin', `<button class="archer" type="button" aria-label="${esc(T.story_shoot)}"><svg viewBox="0 0 60 96" aria-hidden="true"><defs><linearGradient id="bow-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d6b70"/><stop offset=".5" stop-color="#f4f2ef"/><stop offset="1" stop-color="#6d6b70"/></linearGradient></defs><path class="bow-string" id="bow-string" d="M22 4 L22 48 L22 92"/><path class="bow-limb" d="M15 1 Q19 5 22 4 C34 16 44 32 42 48 C44 64 34 80 22 92 Q19 91 15 95"/><rect class="bow-grip" x="39" y="40" width="7" height="16" rx="2.5"/></svg></button>
+      <i class="arrow-trail" id="arrow-trail" aria-hidden="true"></i>
+      <div class="arrow-fly" id="arrow-fly" aria-hidden="true"><svg viewBox="0 0 132 24"><defs><linearGradient id="arrow-head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a9690"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M3 12 L12 3 L30 3 L24 12 Z M3 12 L12 21 L30 21 L24 12 Z" fill="#d41f2c"/><path d="M8 12 L28 12" stroke="#ff2d3f" stroke-width="1"/><rect x="0" y="10.5" width="5" height="3" rx="1" fill="#f4f2ef"/><path d="M5 12 L114 12" stroke="#d9d5cf" stroke-width="2" stroke-linecap="round"/><path d="M112 5 L132 12 L112 19 L116 12 Z" fill="url(#arrow-head)"/></svg></div>`);
+    const archer = $('.archer', tl), string = $('#bow-string'), arrow = $('#arrow-fly'), trail = $('#arrow-trail'), svgA = $('svg', arrow);
+    const vertical = () => window.matchMedia('(max-width: 720px)').matches;
+    const ARROW = 110, REST = 22; // arrow length, string at rest (px from the bow's back)
+    let geo = null;
+    const measure = () => { // layout offsets, not screen boxes: the reveal animations move boxes around
+      const v = vertical(), line = $('.timeline-line', tl), W = tl.clientWidth;
+      const along = (el, off) => v ? el.offsetTop + off : (rtl ? W - el.offsetLeft - el.offsetWidth : el.offsetLeft) + off;
+      const dots = ms.map((m) => along(m, v ? 16 : 6));
+      geo = { v, dots, target: dots[dots.length - 1], lineStart: along(line, 0), lineLen: v ? line.offsetHeight : line.offsetWidth };
+      return geo;
+    };
+    // nock = where the back of the arrow sits, measured along the line from the bow's back edge
+    const place = (nock, wobble = 0) => {
+      const g = geo || measure(); const tip = nock + ARROW;
+      arrow.style.transform = g.v ? `translate3d(0,${nock}px,0)` : `translate3d(${rtl ? -nock : nock}px,0,0)`;
+      svgA.style.rotate = wobble ? `${wobble}deg` : '';
+      const f = Math.max(0, Math.min(1, (tip - g.lineStart) / g.lineLen));
+      fill.style.transform = g.v ? `scaleY(${f})` : `scaleX(${f})`;
+      ms.forEach((m, i) => m.classList.toggle('lit', tip >= g.dots[i] - 2));
+      return tip;
+    };
+    const draw = (x) => string.setAttribute('d', `M22 4 L${x} 48 L22 92`);
+    const finish = () => { measure(); draw(REST); place(geo.target - ARROW); ms[ms.length - 1].classList.add('hit'); trail.style.opacity = 0; };
+    finish();
+    addEventListener('resize', () => { if (!tl.classList.contains('arrow-ready')) finish(); else measure(); }, { passive: true });
+    return { tl, archer, string, arrow, trail, svgA, ms, measure, place, draw, finish, vertical, ARROW, REST, get geo() { return geo; } };
+  })();
+
   // Story strip: arrows scroll it; the soft fade on the edge disappears at the end.
   (function storyStrip() {
     const sc = $('#timeline-scroll');
@@ -423,7 +460,54 @@
   });
 
   // ---------- Timeline line draws in ----------
-  gsap.to('#timeline-fill', { scaleX: 1, scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#timeline', start: 'top 80%', end: 'bottom 60%', scrub: true } });
+  // Apollo's arrow. Laptop: the story comes into view, the bowstring draws back, the arrow flies the
+  // whole line (the strip follows it), every year lights as it passes and the arrow thuds into the
+  // target on the last year. Tap the bow to shoot again. Phone: the arrow rides down the line with your scroll.
+  (function apolloArrow() {
+    const q = quiver, last = q.ms[q.ms.length - 1], sc = $('#timeline-scroll');
+    let shot = null;
+    const reset = () => { q.tl.classList.add('arrow-ready'); last.classList.remove('hit'); q.measure(); q.draw(q.REST); q.place(q.REST); };
+    const shudder = () => { const o = { t: 0 }; gsap.to(o, { t: 1, duration: .6, ease: 'none', onUpdate: () => { q.svgA.style.rotate = `${Math.sin(o.t * 26) * 5 * (1 - o.t)}deg`; }, onComplete: () => { q.svgA.style.rotate = ''; } }); };
+    const hit = () => { last.classList.add('lit', 'hit'); shudder(); };
+    const follow = () => { // keep the arrow tip in view while the strip is scrollable
+      if (sc.scrollWidth <= sc.clientWidth + 2) return;
+      const a = q.arrow.getBoundingClientRect(), b = sc.getBoundingClientRect();
+      const tipX = rtl ? a.left : a.right, mark = rtl ? b.right - b.width * .62 : b.left + b.width * .62;
+      const over = rtl ? mark - tipX : tipX - mark;
+      if (over > 0) sc.scrollLeft += rtl ? -over : over;
+    };
+    const shoot = () => {
+      if (shot) shot.kill(); reset();
+      sc.scrollTo({ left: 0, behavior: 'auto' });
+      const s = { pull: q.REST, nock: q.REST, t: 0 }, g = q.geo, end = g.target - q.ARROW, flight = 1.25 + (end / 1800);
+      let prevTip = q.REST + q.ARROW;
+      shot = gsap.timeline({ onComplete: () => { shot = null; } })
+        .to(s, { pull: 0, duration: .85, ease: 'power2.inOut', onUpdate: () => { q.draw(s.pull); q.place(s.pull); } })
+        .to(s, { pull: q.REST, duration: .5, ease: 'elastic.out(1.2, .25)', onUpdate: () => q.draw(s.pull) }, '+=.12')
+        .fromTo(s, { nock: 0, t: 0 }, { nock: end, t: 1, duration: flight, ease: 'power2.out', onUpdate: () => {
+          const tip = q.place(s.nock, Math.sin(s.t * 34) * 2.4 * (1 - s.t)); // archer's paradox: a fading flex
+          const speed = Math.abs(tip - prevTip); prevTip = tip;
+          q.trail.style.opacity = Math.min(1, speed / 14);
+          const tx = tip - 150; q.trail.style.transform = `translate3d(${rtl ? -tx : tx}px,0,0)`;
+          follow();
+        }, onComplete: () => { q.trail.style.opacity = 0; hit(); } }, '<');
+    };
+    if (q.vertical()) {
+      reset();
+      ScrollTrigger.create({ trigger: q.tl, start: 'top 70%', end: 'bottom 72%', scrub: .5, onUpdate: (st) => {
+        const p = st.progress, g = q.geo, end = g.target - q.ARROW;
+        if (p < .07) { const k = p / .07; q.draw(q.REST * (1 - k)); q.place(q.REST * (1 - k)); last.classList.remove('hit'); return; }
+        q.draw(q.REST);
+        const k = (p - .07) / .93; q.place(end * k);
+        if (k >= .995 && !last.classList.contains('hit')) hit();
+        if (k < .97) last.classList.remove('hit');
+      }, onRefresh: () => q.measure() });
+    } else {
+      reset();
+      ScrollTrigger.create({ trigger: q.tl, start: 'top 72%', once: true, onEnter: shoot });
+      q.archer.addEventListener('click', shoot);
+    }
+  })();
 
   // ---------- Ethos cards shrink as the next one covers them ----------
   $$('.ethos-card').forEach((card, i, all) => {
