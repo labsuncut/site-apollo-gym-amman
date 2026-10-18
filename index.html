@@ -40,7 +40,7 @@
       "addressLocality": "Amman",
       "addressCountry": "JO"
     },
-    "openingHours": ["Sa-Th 06:00-23:30", "Fr 11:00-19:00"]
+    "openingHours": ["Sa-Th 06:00-00:00", "Fr 11:00-19:00"]
   }
   </script>
 </head>
@@ -80,9 +80,13 @@
         <a href="#membership" data-t="nav_plans"></a>
         <a href="#faq" data-t="nav_faq"></a>
         <a href="#visit" data-t="nav_visit"></a>
-        <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
+        <a class="nav-live live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
       </nav>
       <div class="header-actions">
+          <div class="socials" aria-label="Apollo on social media">
+            <a class="social ig-link" href="#" target="_blank" rel="noopener" data-label="social_instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm4.5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm5-3.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/></svg></a>
+            <a class="social fb-link" href="#" target="_blank" rel="noopener" data-label="social_facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.3c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.3H7.4V14h2.7v8h3.4Z"/></svg></a>
+        </div>
         <button id="lang" class="lang" type="button" data-t="lang_btn"></button>
         <a class="btn btn-small tel-link" href="#" data-t="nav_cta"></a>
         <button id="menu-open" class="burger" type="button" aria-expanded="false" aria-controls="overlay"><span></span><span></span><span data-t="menu" class="sr"></span></button>
@@ -103,9 +107,13 @@
       <a href="#faq" data-t="nav_faq"></a>
       <a href="#visit" data-t="nav_visit"></a>
       <a href="#franchise" data-t="nav_franchise"></a>
-      <a class="nav-live" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
+      <a class="nav-live live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
     </nav>
     <a class="btn btn-big tel-link overlay-cta" href="#" data-t="enquire_call"></a>
+    <div class="socials overlay-socials" aria-label="Apollo on social media">
+      <a class="social ig-link" href="#" target="_blank" rel="noopener" data-label="social_instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm4.5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm5-3.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/></svg><span data-t="instagram"></span></a>
+      <a class="social fb-link" href="#" target="_blank" rel="noopener" data-label="social_facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.3c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.3H7.4V14h2.7v8h3.4Z"/></svg><span data-t="facebook"></span></a>
+    </div>
   </div>
 
   <main id="main">
@@ -183,7 +191,11 @@
         <p class="kicker reveal" data-t="programs_kicker"></p>
         <h2 class="split" data-t="programs_title"></h2>
         <p class="lead reveal" data-t="programs_text"></p>
-        <div class="programs" id="programs-list"></div>
+        <div class="programs-grid">
+          <div class="programs" id="programs-list"></div>
+          <!-- One calm photo panel that changes with the row you hover or focus, instead of a thumbnail chasing the cursor -->
+          <div class="program-stage reveal" id="program-stage" aria-hidden="true"></div>
+        </div>
         <ul class="amenities reveal" id="amenities"></ul>
       </div>
     </section>
@@ -207,7 +219,11 @@
       <div class="wrap">
         <p class="kicker reveal" data-t="story_kicker"></p>
         <h2 class="split" data-t="story_title"></h2>
-        <div class="timeline" id="timeline"><i class="timeline-line"><b id="timeline-fill"></b></i></div>
+        <div class="story-head"><div class="quotes-nav" id="story-nav">
+          <button class="round-btn" id="story-prev" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="round-btn" id="story-next" type="button"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div></div>
+        <div class="timeline-scroll" id="timeline-scroll"><div class="timeline" id="timeline"><i class="timeline-line"><b id="timeline-fill"></b></i></div></div>
       </div>
     </section>
 
@@ -216,7 +232,14 @@
       <div class="wrap">
         <p class="kicker reveal" data-t="members_kicker"></p>
         <h2 class="split" data-t="members_title"></h2>
+        <div class="quotes-head">
+          <div class="quotes-nav" id="quotes-nav" hidden>
+            <button class="round-btn" id="quotes-prev" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="round-btn" id="quotes-next" type="button"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
         <div class="quotes" id="quotes"></div>
+        <div class="quotes-dots" id="quotes-dots" aria-hidden="true"></div>
         <a class="google-badge reveal" id="google-link" href="#" target="_blank" rel="noopener"><b>★★★★★</b><span data-t="google_badge"></span></a>
       </div>
     </section>
@@ -262,7 +285,7 @@
           <h2 data-t="live_title"></h2>
           <p data-t="live_text"></p>
         </div>
-        <a class="btn live-btn" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_cta"></a>
+        <a class="btn live-btn live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_cta"></a>
       </div>
     </section>
 
@@ -280,6 +303,7 @@
               <a class="btn wa-link" href="#" data-t="whatsapp"></a>
               <a class="btn btn-ghost tel-link" href="#" data-t="call"></a>
               <a class="btn btn-ghost ig-link" href="#" data-t="instagram" target="_blank" rel="noopener"></a>
+              <a class="btn btn-ghost fb-link" href="#" data-t="facebook" target="_blank" rel="noopener"></a>
             </div>
             <p class="contact-lines" id="contact-lines"></p>
             <h3 data-t="address_title"></h3>
@@ -328,6 +352,20 @@
   </footer>
 
   <!-- Sticky WhatsApp bar on phones -->
+  <!-- Apollo Live bubble: always in view. Click opens the live floor counter in a panel without leaving the site -->
+  <button class="live-bubble" id="live-bubble" type="button" aria-haspopup="dialog" aria-controls="live-panel" aria-expanded="false">
+    <i aria-hidden="true"></i><span class="live-bubble-count" id="live-count" hidden></span><span class="live-bubble-label" data-t="live_bubble"></span>
+  </button>
+  <div class="live-panel" id="live-panel" role="dialog" aria-modal="true" aria-labelledby="live-panel-title" hidden>
+    <div class="live-panel-box">
+      <div class="live-panel-head">
+        <div><h2 id="live-panel-title" data-t="live_panel_title"></h2><p data-t="live_panel_text"></p></div>
+        <button class="round-btn" id="live-close" type="button"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <iframe class="live-frame" id="live-frame" title="Apollo Live" loading="lazy" src="about:blank"></iframe>
+      <a class="text-link live-tab" id="live-tab" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_open_tab"></a>
+    </div>
+  </div>
   <a class="call-bar tel-link" href="#" data-t="enquire_call"></a>
 
   <script src="assets/js/vendor/gsap.min.js"></script>

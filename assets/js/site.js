@@ -30,6 +30,9 @@
   $$('.wa-member').forEach((a) => { a.href = waMember; a.target = '_blank'; a.rel = 'noopener'; });
   $$('.tel-link').forEach((a) => { a.href = `tel:${BUSINESS.phone}`; });
   $$('.ig-link').forEach((a) => { a.href = BUSINESS.instagram; });
+  $$('.fb-link').forEach((a) => { a.href = BUSINESS.facebook; });
+  $$('[data-label]').forEach((el) => { el.setAttribute('aria-label', T[el.dataset.label] || ''); });
+  $$('.live-open, #live-tab').forEach((a) => { a.href = BUSINESS.liveUrl; });
   $$('.mail-link').forEach((a) => { a.href = `mailto:${BUSINESS.email}`; });
   $$('.map-link').forEach((a) => { a.href = BUSINESS.google; });
   $('#google-link').href = BUSINESS.google;
@@ -62,8 +65,18 @@
   // ---------- Programs ----------
   $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
     const [name, text] = p[lang];
-    return `<div class="program reveal"><span class="program-num">${pad(i + 1)}</span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span class="program-thumb"><img src="${esc(p.img)}" alt="" loading="lazy"></span></div>`;
+    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" tabindex="0" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>`;
   }).join('');
+  // The photo panel: one image per program, stacked; the active one fades in. Hover or keyboard focus picks it.
+  $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" alt="" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
+  const stageImgs = $$('#program-stage img'), stageLabel = $('#program-stage-label');
+  const pickProgram = (i) => {
+    $$('.program').forEach((r, k) => r.classList.toggle('is-active', k === i));
+    stageImgs.forEach((im, k) => im.classList.toggle('is-active', k === i));
+    stageLabel.textContent = `${pad(i + 1)} · ${PROGRAMS[i][lang][0]}`;
+  };
+  pickProgram(0);
+  $$('.program').forEach((row) => { ['mouseenter', 'focus'].forEach((ev) => row.addEventListener(ev, () => pickProgram(+row.dataset.i))); });
   $('#amenities').innerHTML = T.amenities.map((a) => `<li>${esc(a)}</li>`).join('');
 
   // ---------- Ethos ----------
@@ -74,13 +87,42 @@
   $('#values').innerHTML = T.values.map((v) => `<span>${esc(v)}</span>`).join('');
 
   // ---------- Story ----------
+  $('#timeline').style.setProperty('--n', STORY.length);
   $('#timeline').insertAdjacentHTML('beforeend', STORY.map((s) => {
     const [title, text] = s[lang];
     return `<div class="milestone reveal"><b>${esc(s.y)}</b><h3>${esc(title)}</h3><p>${esc(text)}</p></div>`;
   }).join(''));
 
+  // Story strip: arrows scroll it; the soft fade on the edge disappears at the end.
+  (function storyStrip() {
+    const sc = $('#timeline-scroll');
+    const step = () => Math.max(224, sc.clientWidth * .6);
+    const atEnd = () => sc.classList.toggle('is-end', Math.abs(sc.scrollLeft) + sc.clientWidth >= sc.scrollWidth - 4);
+    $('#story-prev').addEventListener('click', () => sc.scrollBy({ left: -step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' }));
+    $('#story-next').addEventListener('click', () => sc.scrollBy({ left: step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' }));
+    $('#story-prev').setAttribute('aria-label', T.quotes_prev); $('#story-next').setAttribute('aria-label', T.quotes_next);
+    sc.addEventListener('scroll', atEnd, { passive: true }); addEventListener('resize', atEnd); atEnd();
+  })();
+
   // ---------- Quotes ----------
   $('#quotes').innerHTML = QUOTES.map((q) => `<blockquote class="quote reveal"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`).join('');
+  // Reviews carousel: swipe or use the arrows; dots show where you are. Controls only appear with 2+ reviews.
+  (function quotesCarousel() {
+    const track = $('#quotes'), dots = $('#quotes-dots'), nav = $('#quotes-nav');
+    const cards = $$('.quote', track);
+    if (cards.length < 2) return;
+    nav.hidden = false;
+    $('#quotes-prev').setAttribute('aria-label', T.quotes_prev); $('#quotes-next').setAttribute('aria-label', T.quotes_next);
+    dots.innerHTML = cards.map(() => '<i></i>').join('');
+    const dotEls = $$('i', dots);
+    const current = () => { const x = Math.abs(track.scrollLeft); return Math.round(x / (cards[0].offsetWidth + 20)); };
+    const mark = () => { const c = Math.min(cards.length - 1, current()); dotEls.forEach((d, k) => d.classList.toggle('is-on', k === c)); };
+    const go = (n) => { const c = Math.max(0, Math.min(cards.length - 1, current() + n)); cards[c].scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'nearest', inline: 'start' }); };
+    $('#quotes-prev').addEventListener('click', () => go(-1));
+    $('#quotes-next').addEventListener('click', () => go(1));
+    track.addEventListener('scroll', mark, { passive: true });
+    mark();
+  })();
 
   // ---------- FAQ, membership, family ----------
   $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
@@ -98,7 +140,7 @@
   const today = now.getDay();
   const fmt = (s) => {
     let [h, m] = s.split(':').map(Number); h %= 24;
-    if (lang === 'ar') return `${h}:${pad(m)}`;
+    if (lang === 'ar') return h === 0 && m === 0 ? '12:00 ليلاً' : `${h}:${pad(m)}`;
     return `${h % 12 || 12}:${pad(m)} ${h < 12 ? 'AM' : 'PM'}`;
   };
   $('#hours').innerHTML = BUSINESS.hours.map((h, i) => `<tr${i === today ? ' class="is-today"' : ''}><th data-today="${esc(T.today)}">${esc(T.days[i])}</th><td dir="ltr">${h ? `${fmt(h[0])} – ${fmt(h[1])}` : (lang === 'ar' ? 'مغلق' : 'Closed')}</td></tr>`).join('');
@@ -107,7 +149,9 @@
     const m = now.getHours() * 60 + now.getMinutes();
     const toMin = (s) => { const [h, mm] = s.split(':').map(Number); return h * 60 + mm; };
     const t = BUSINESS.hours[today];
-    const open = t && m >= toMin(t[0]) && m < toMin(t[1]);
+    // A close of 00:00 (or any time before the open) means past midnight.
+    const closeMin = t ? (toMin(t[1]) <= toMin(t[0]) ? toMin(t[1]) + 1440 : toMin(t[1])) : 0;
+    const open = t && m >= toMin(t[0]) && m < closeMin;
     el.classList.toggle('is-open', !!open);
     $('span', el).textContent = open ? `${T.open_now} · ${T.closes} ${fmt(t[1])}` : `${T.closed_now} · ${T.opens} ${fmt((BUSINESS.hours[t && m < toMin(t[0]) ? today : (today + 1) % 7] || ['06:00'])[0])}`;
   })();
@@ -124,6 +168,34 @@
   openBtn.addEventListener('click', () => setMenu(overlay.hidden));
   $('#menu-close').addEventListener('click', () => setMenu(false));
   $$('.overlay a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
+  // ---------- Apollo Live: bubble + panel ----------
+  // The bubble stays in view; the panel shows Apollo's own live page in a frame, with a new-tab link as the fallback.
+  (function liveBubble() {
+    const bubble = $('#live-bubble'), panel = $('#live-panel'), frame = $('#live-frame'), count = $('#live-count');
+    let loaded = false;
+    const setPanel = (show) => {
+      panel.hidden = !show;
+      bubble.setAttribute('aria-expanded', String(show));
+      if (show && !loaded) { loaded = true; frame.src = BUSINESS.liveUrl; }
+      if (lenis) show ? lenis.stop() : lenis.start();
+      if (show) $('#live-close').focus(); else bubble.focus();
+    };
+    bubble.addEventListener('click', () => setPanel(panel.hidden));
+    $('#live-close').addEventListener('click', () => setPanel(false));
+    panel.addEventListener('click', (e) => { if (e.target === panel) setPanel(false); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setPanel(false); });
+    $$('.live-open').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); setMenu(false); setPanel(true); }));
+    $('#live-close').setAttribute('aria-label', T.live_close);
+    // Live number in the bubble, only when Apollo gives us an endpoint for it.
+    if (BUSINESS.liveCountUrl) {
+      const pull = () => fetch(BUSINESS.liveCountUrl, { cache: 'no-store' }).then((r) => r.json()).then((d) => {
+        const n = Number(d.count ?? d.members ?? d.value);
+        if (!isNaN(n)) { count.textContent = n; count.hidden = false; bubble.title = `${n} ${T.live_members}`; }
+      }).catch(() => {});
+      pull(); setInterval(pull, 60000);
+    }
+  })();
 
   // ---------- Header shadow ----------
   const header = $('.site-header');
@@ -260,14 +332,6 @@
     const n = +el.dataset.n, dec = +el.dataset.dec, o = { v: 0 };
     gsap.to(o, { v: n, duration: 1.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' }, onUpdate: () => { el.textContent = o.v.toFixed(dec); } });
   });
-
-  // ---------- Program hover thumbnail follows the mouse ----------
-  if (window.matchMedia('(hover: hover)').matches) {
-    $$('.program').forEach((row) => {
-      const thumb = $('.program-thumb', row);
-      row.addEventListener('mousemove', (e) => { const r = row.getBoundingClientRect(); gsap.to(thumb, { left: e.clientX - r.left - 150, duration: .5, ease: 'power3.out' }); });
-    });
-  }
 
   // ---------- Timeline line draws in ----------
   gsap.to('#timeline-fill', { scaleX: 1, scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#timeline', start: 'top 80%', end: 'bottom 60%', scrub: true } });

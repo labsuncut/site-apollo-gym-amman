@@ -11,10 +11,15 @@ const BUSINESS = {
   mobileDisplay: '+962 79 979 2078',
   email: 'info@apollotf.com',
   instagram: 'https://www.instagram.com/apollogym.jo/',
+  facebook: 'https://www.facebook.com/atf.jo/',
+  // Apollo Live: their live floor counter. The bubble opens this page in a panel. If Apollo gives us a JSON
+  // endpoint for the number (e.g. { "count": 42 }), put its URL in liveCountUrl and the bubble shows the count.
+  liveUrl: 'https://www.apollotrainingfacility.com/live',
+  liveCountUrl: '',
   google: 'https://www.google.com/maps/search/?api=1&query=Apollo+Training+Facility+Mecca+Street+Amman',
   mapEmbed: 'https://www.google.com/maps?q=Apollo+Training+Facility,+Mecca+Street,+Al+Sayegh+Commercial+Complex,+Amman&output=embed',
-  // Opening hours, Sunday first: [open, close] in 24h. From the website's gym page.
-  hours: [['06:00', '23:30'], ['06:00', '23:30'], ['06:00', '23:30'], ['06:00', '23:30'], ['06:00', '23:30'], ['11:00', '19:00'], ['06:00', '23:30']]
+  // Opening hours, Sunday first: [open, close] in 24h. '00:00' as a close means midnight. Confirmed by the owner (2026-10-18).
+  hours: [['06:00', '00:00'], ['06:00', '00:00'], ['06:00', '00:00'], ['06:00', '00:00'], ['06:00', '00:00'], ['11:00', '19:00'], ['06:00', '00:00']]
 };
 
 const TEXT = {
@@ -61,6 +66,9 @@ const TEXT = {
     faq_kicker: '08 · FAQ', faq_title: 'Good questions',
     faq_text: 'The things people ask before their first visit. Anything else, send a message.',
     live_title: 'Apollo Live', live_text: 'See how busy the floor is right now, before you leave the house.', live_cta: 'Open Apollo Live',
+    live_bubble: 'Live floor', live_bubble_hint: 'How busy is it now?', live_panel_title: 'Apollo Live', live_panel_text: 'How busy the floor is at this moment, straight from the gym.', live_open_tab: 'Open in a new tab', live_close: 'Close', live_members: 'on the floor',
+    quotes_prev: 'Previous review', quotes_next: 'Next review',
+    social_instagram: 'Apollo on Instagram', social_facebook: 'Apollo on Facebook', facebook: 'Facebook',
     visit_kicker: '09 · Visit', visit_title: 'Come see it',
     hours_title: 'Opening hours', contact_title: 'Talk to us', address_title: 'Find us',
     address: 'Mecca Street, Al Sayegh Commercial Complex #181, Amman, Jordan',
@@ -119,6 +127,9 @@ const TEXT = {
     faq_kicker: '٠٨ · الأسئلة الشائعة', faq_title: 'أسئلة بمحلها',
     faq_text: 'الأشياء التي يسألها الناس قبل أول زيارة. أي شيء آخر، ابعث رسالة.',
     live_title: 'أبولو مباشر', live_text: 'شوف كم الصالة مزدحمة الآن، قبل ما تطلع من البيت.', live_cta: 'افتح أبولو مباشر',
+    live_bubble: 'الصالة مباشر', live_bubble_hint: 'كم مزدحمة الآن؟', live_panel_title: 'أبولو مباشر', live_panel_text: 'كم الصالة مزدحمة في هذه اللحظة، مباشرة من النادي.', live_open_tab: 'افتح في تبويب جديد', live_close: 'إغلاق', live_members: 'في الصالة',
+    quotes_prev: 'الرأي السابق', quotes_next: 'الرأي التالي',
+    social_instagram: 'أبولو على إنستغرام', social_facebook: 'أبولو على فيسبوك', facebook: 'فيسبوك',
     visit_kicker: '٠٩ · زورونا', visit_title: 'تعال شوفه بنفسك',
     hours_title: 'ساعات العمل', contact_title: 'تواصل معنا', address_title: 'موقعنا',
     address: 'شارع مكة، مجمع الصايغ التجاري #181، عمّان، الأردن',
@@ -191,14 +202,16 @@ const STORY = [
   { y: '2018', en: ['The idea', 'December 2018: Yousef Al Masri, Mohammad Al Masri and Dorian Yates meet to create the ultimate gym in Amman.'], ar: ['الفكرة', 'ديسمبر ٢٠١٨: يوسف المصري ومحمد المصري ودوريان ييتس يلتقون لصناعة النادي الأمثل في عمّان.'] },
   { y: '2019', en: ['The hunt', 'The search for the perfect spot begins. The heart of Amman wins.'], ar: ['البحث', 'يبدأ البحث عن المكان المثالي. قلب عمّان يفوز.'] },
   { y: '2021', en: ['The brand', 'The Apollo brand is born and ready to be commenced.'], ar: ['العلامة', 'تولد علامة أبولو وتصبح جاهزة للانطلاق.'] },
-  { y: '2023', en: ['The doors', '1 October 2023: Apollo officially opens on Mecca Street.'], ar: ['الأبواب', '١ أكتوبر ٢٠٢٣: أبولو يفتح أبوابه رسمياً على شارع مكة.'] }
+  { y: '2023', en: ['The doors', '1 October 2023: Apollo officially opens on Mecca Street.'], ar: ['الأبواب', '١ أكتوبر ٢٠٢٣: أبولو يفتح أبوابه رسمياً على شارع مكة.'] },
+  // 2024-2026 from the owner's notes (2026-10-18). Short on purpose; he will send fuller wording.
+  { y: '2024', en: ['The craft', 'The first full year. Apollo sharpens the floor, the classes and the way it trains people.'], ar: ['الصنعة', 'أول سنة كاملة. أبولو يصقل الصالة والحصص وطريقته في تدريب الناس.'] },
+  { y: '2025', en: ['The rise', 'Yousef Al-Masri teams up with Abed Salameh, and Apollo takes off: the city starts talking about the gym on Mecca Street.'], ar: ['الانطلاقة', 'يوسف المصري يتعاون مع عبد سلامة، وأبولو ينطلق: المدينة تبدأ تحكي عن النادي على شارع مكة.'] },
+  { y: '2026', en: ['The family', 'The community comes together: training partners, group runs, football games. Apollo becomes more than a gym.'], ar: ['العائلة', 'المجتمع يكتمل: شركاء تمرين، ركض جماعي، مباريات كرة. أبولو يصبح أكثر من نادٍ.'] }
 ];
 
-// Real member quotes, as published on Apollo's website.
+// Real member quotes only. Add more here as Apollo approves them (name, role, English, Arabic); the carousel grows by itself.
+// Removed 2026-10-18 at the owner's request: Mohammad Riyal.
 const QUOTES = [
-  { name: 'Mohammad Riyal', role: { en: 'Content creator', ar: 'صانع محتوى' },
-    en: 'No one’s ever been able to change my body like Apollo have. I’m grateful for everyone at Apollo.',
-    ar: 'ما حدا قدر يغيّر جسمي مثل أبولو. ممتن لكل شخص في أبولو.' },
   { name: 'Mohammad Nsour', role: { en: 'IFBB Pro & Olympian', ar: 'محترف IFBB وأولمبي' },
     en: 'Apollo has everything a professional, an amateur or just a normal fitness person needs. Great atmosphere, great facilities and the best vibes. It’s my second home.',
     ar: 'أبولو فيه كل ما يحتاجه المحترف والهاوي وأي شخص يحب الرياضة. أجواء رائعة ومرافق ممتازة وأفضل فايبز. هو بيتي الثاني.' }
@@ -206,7 +219,7 @@ const QUOTES = [
 
 // Only facts from Apollo's listings and this site: hours, trial classes, parking, facilities. No prices on the site.
 const FAQ = [
-  { en: ['When are you open?', 'Saturday to Thursday from 6:00 AM to 11:30 PM, and Friday from 11:00 AM to 7:00 PM.'], ar: ['متى تفتحون؟', 'من السبت إلى الخميس من ٦:٠٠ صباحاً حتى ١١:٣٠ مساءً، والجمعة من ١١:٠٠ صباحاً حتى ٧:٠٠ مساءً.'] },
+  { en: ['When are you open?', 'Saturday to Thursday from 6:00 AM to midnight, and Friday from 11:00 AM to 7:00 PM.'], ar: ['متى تفتحون؟', 'من السبت إلى الخميس من ٦:٠٠ صباحاً حتى ١٢:٠٠ منتصف الليل، والجمعة من ١١:٠٠ صباحاً حتى ٧:٠٠ مساءً.'] },
   { en: ['Can I try before I join?', 'Yes. Trial classes are available. Message us on WhatsApp and we will book you in.'], ar: ['هل أقدر أجرّب قبل الاشتراك؟', 'نعم. الحصص التجريبية متاحة. ابعث لنا على واتساب ونحجز لك.'] },
   { en: ['How do I join?', 'Call Apollo or message the team on WhatsApp. They will explain how membership works and invite you to come and see the place.'], ar: ['كيف أنضم؟', 'اتصل بأبولو أو ابعث للفريق على واتساب. بيشرحولك كيف بتمشي العضوية وبيدعوك تزور المكان.'] },
   { en: ['Is it busy right now?', 'Check Apollo Live before you come. It shows how full the floor is at this moment.'], ar: ['هل الصالة مزدحمة الآن؟', 'افتح أبولو مباشر قبل ما تيجي. يعرض لك كم الصالة ممتلئة في هذه اللحظة.'] },
