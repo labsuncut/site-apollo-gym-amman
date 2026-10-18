@@ -223,24 +223,49 @@
   const step = () => { const [a, b] = $$('.tour-item'); return a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; };
   const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(p > .98 ? shown : Math.min(shown, Math.round(Math.abs(viewport.scrollLeft) / step()) + 1)); };
   viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
-  const go = (n) => viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
-  // Phones: any clear sideways swipe moves exactly one photo, even a short one (native snap alone needs a long drag).
-  let touch = null;
-  const current = () => Math.round(Math.abs(viewport.scrollLeft) / step());
-  viewport.addEventListener('touchstart', (e) => { const p = e.touches[0]; touch = { x: p.clientX, y: p.clientY, i: current() }; }, { passive: true });
-  viewport.addEventListener('touchend', (e) => {
-    if (!touch) return; const p = e.changedTouches[0]; const dx = p.clientX - touch.x, dy = p.clientY - touch.y; const from = touch.i; touch = null;
-    if (Math.abs(dx) < 30 || Math.abs(dx) < Math.abs(dy)) return;
-    const forward = rtl ? dx > 0 : dx < 0;
-    const to = Math.max(0, Math.min(shown - 1, from + (forward ? 1 : -1)));
-    viewport.scrollTo({ left: to * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
-  }, { passive: true });
+  // Touch screens: the gallery is a true slider, not a scroll box. The track follows the finger,
+  // and on release any small swipe glides to the next (or previous) full photo. Never half a photo.
+  const slider = window.matchMedia('(pointer: coarse)').matches;
+  let at = 0; // index of the photo in view (slider mode)
+  const maxShift = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+  const shiftFor = (i) => Math.min(i * step(), maxShift());
+  const place = (px, animate) => {
+    track.style.transition = animate && !calm ? 'transform .42s cubic-bezier(.2,.8,.2,1)' : 'none';
+    track.style.transform = `translate3d(${rtl ? px : -px}px,0,0)`;
+  };
+  const showAt = (i, animate = true) => {
+    at = Math.max(0, Math.min(shown - 1, i)); place(shiftFor(at), animate);
+    bar.style.transform = `scaleX(${shown > 1 ? at / (shown - 1) : 0})`; idx.textContent = pad(at + 1);
+  };
+  const go = (n) => slider ? showAt(at + n) : viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
+  if (slider) {
+    viewport.classList.add('is-slider');
+    let t = null;
+    viewport.addEventListener('touchstart', (e) => { const p = e.touches[0]; t = { x: p.clientX, y: p.clientY, time: Date.now(), dir: 0 }; track.style.transition = 'none'; }, { passive: true });
+    viewport.addEventListener('touchmove', (e) => {
+      if (!t) return; const p = e.touches[0]; const dx = p.clientX - t.x, dy = p.clientY - t.y;
+      if (!t.dir) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; t.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
+      if (t.dir !== 'x') return;
+      e.preventDefault();
+      let shift = shiftFor(at) - (rtl ? -dx : dx);
+      if (shift < 0 || shift > maxShift()) shift = shift < 0 ? shift / 3 : maxShift() + (shift - maxShift()) / 3; // soft edges
+      place(shift, false); t.dx = dx;
+    }, { passive: false });
+    const release = () => {
+      if (!t) return; const dx = t.dir === 'x' ? (t.dx || 0) : 0; const fast = Math.abs(dx) / Math.max(1, Date.now() - t.time) > .25; t = null;
+      if (Math.abs(dx) > 18 || (fast && Math.abs(dx) > 6)) showAt(at + ((rtl ? dx > 0 : dx < 0) ? 1 : -1)); else showAt(at);
+    };
+    viewport.addEventListener('touchend', release, { passive: true });
+    viewport.addEventListener('touchcancel', release, { passive: true });
+    addEventListener('resize', () => showAt(at, false), { passive: true });
+    showAt(0, false);
+  }
   $('#tour-prev').addEventListener('click', () => go(-1));
   $('#tour-next').addEventListener('click', () => go(1));
   viewport.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });
   $('#tour-more').addEventListener('click', () => {
     track.insertAdjacentHTML('beforeend', SPACE.slice(shown).map((s, i) => tourItem(s, shown + i)).join(''));
-    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; onSwipe();
+    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; slider ? showAt(at, false) : onSwipe();
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
 
@@ -253,7 +278,7 @@
     // Reduced motion: the lit rooftop holds as a still, then dissolves. Still once per visit.
     if (introSeen()) ld.remove();
     else { ld.style.transition = 'opacity .6s'; const go = () => { ld.style.opacity = 0; setTimeout(() => ld.remove(), 620); }; $('#loader-skip').addEventListener('click', go); setTimeout(go, 1400); }
-    $('#tour-bar').style.transform = 'none';
+    if (!slider) $('#tour-bar').style.transform = 'none';
     $('#timeline-fill').style.transform = 'none';
     return;
   }

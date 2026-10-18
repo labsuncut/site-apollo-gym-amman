@@ -172,6 +172,10 @@ html[dir="rtl"] .tour-btn svg { transform: scaleX(-1); }
 html[lang="ar"] .tour-hint { letter-spacing: 0; }
 .tour-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; }
 .tour-viewport::-webkit-scrollbar { display: none; }
+/* Touch screens: JS slider (one swipe = one photo); vertical page scroll still passes through. */
+.tour-viewport.is-slider { overflow: hidden; scroll-snap-type: none; touch-action: pan-y; }
+.tour-viewport.is-slider .tour-track { will-change: transform; }
+.tour-viewport.is-slider .tour-item { scroll-snap-align: none; }
 .tour-viewport:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
 .tour-track { display: flex; gap: 20px; padding: 0 max(24px, calc((100vw - 1200px) / 2 + 24px)); width: max-content; }
 .tour-item { position: relative; flex: none; height: clamp(300px, 52vh, 560px); aspect-ratio: 16 / 10; scroll-snap-align: start; border-radius: var(--radius); overflow: hidden; background: var(--bg2); }
