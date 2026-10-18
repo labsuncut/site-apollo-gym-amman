@@ -281,7 +281,9 @@ html[dir="rtl"] .quotes-nav .round-btn svg { transform: scaleX(-1); }
 @keyframes quotes-glide { to { transform: translateX(-50%); } }
 html[dir="rtl"] .quotes-track { animation-name: quotes-glide-rtl; }
 @keyframes quotes-glide-rtl { to { transform: translateX(50%); } }
-.quotes-track .quote p { font-size: 1.1rem; }
+.quotes-track .quote p { font-size: 1.05rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
+.quotes-track .quote { align-self: stretch; display: flex; flex-direction: column; }
+.quotes-track .quote cite { margin-top: auto; }
 .quotes-dots { display: flex; gap: 8px; margin-top: 18px; }
 .quotes-dots:empty { display: none; }
 .quotes-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .3s, width .3s; }
