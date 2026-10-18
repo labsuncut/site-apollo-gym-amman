@@ -105,10 +105,24 @@
   })();
 
   // ---------- Quotes ----------
-  $('#quotes').innerHTML = QUOTES.map((q) => `<blockquote class="quote reveal"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`).join('');
-  // Reviews carousel: swipe or use the arrows; dots show where you are. Controls only appear with 2+ reviews.
-  (function quotesCarousel() {
+  // Reviews. With 3+ reviews they glide past on their own (a slow ticker that pauses when you hover or touch it);
+  // with fewer they sit still. Reduced-motion visitors get a swipeable row with arrows instead.
+  (function reviews() {
     const track = $('#quotes'), dots = $('#quotes-dots'), nav = $('#quotes-nav');
+    const card = (q) => `<blockquote class="quote"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`;
+    const html = QUOTES.map(card).join('');
+    if (QUOTES.length >= 3 && !calm) {
+      track.classList.add('is-ticker');
+      track.innerHTML = `<div class="quotes-track" style="--dur:${QUOTES.length * 9}s">${html}${html}</div>`;
+      track.setAttribute('aria-label', T.members_title);
+      // A finger on the ticker pauses it, so a review can be read on a phone.
+      const tr = $('.quotes-track', track);
+      track.addEventListener('pointerdown', () => { tr.style.animationPlayState = 'paused'; }, { passive: true });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => track.addEventListener(ev, () => { tr.style.animationPlayState = ''; }, { passive: true }));
+      return;
+    }
+    track.innerHTML = html;
+    $$('.quote', track).forEach((q) => q.classList.add('reveal'));
     const cards = $$('.quote', track);
     if (cards.length < 2) return;
     nav.hidden = false;

@@ -273,6 +273,15 @@ html[dir="rtl"] .quotes-nav .round-btn svg { transform: scaleX(-1); }
 .quotes::-webkit-scrollbar { display: none; }
 .quotes > .quote { flex: 0 0 min(560px, calc(50% - 10px)); scroll-snap-align: start; }
 .quotes > .quote:only-child { flex-basis: min(720px, 100%); }
+/* Ticker mode: the row of reviews is duplicated once and slides by one full set, so the loop is seamless. */
+.quotes.is-ticker { overflow: hidden; scroll-snap-type: none; mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); }
+.quotes-track { display: flex; width: max-content; animation: quotes-glide var(--dur, 60s) linear infinite; }
+.quotes-track .quote { flex: 0 0 min(440px, 78vw); margin-inline-end: 20px; }
+.quotes.is-ticker:hover .quotes-track, .quotes.is-ticker:focus-within .quotes-track { animation-play-state: paused; }
+@keyframes quotes-glide { to { transform: translateX(-50%); } }
+html[dir="rtl"] .quotes-track { animation-name: quotes-glide-rtl; }
+@keyframes quotes-glide-rtl { to { transform: translateX(50%); } }
+.quotes-track .quote p { font-size: 1.1rem; }
 .quotes-dots { display: flex; gap: 8px; margin-top: 18px; }
 .quotes-dots:empty { display: none; }
 .quotes-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .3s, width .3s; }
