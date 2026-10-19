@@ -415,11 +415,18 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 .faq-item:last-child { border-bottom: 1px solid var(--line); }
 .faq-item summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 0; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 1.05rem; }
 .faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary i { flex: none; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; position: relative; transition: transform .4s var(--ease), border-color .3s; }
-.faq-item summary i::before, .faq-item summary i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; background: var(--ink); transform: translate(-50%, -50%); }
-.faq-item summary i::after { transform: translate(-50%, -50%) rotate(90deg); }
-.faq-item[open] summary i { transform: rotate(45deg); border-color: var(--red); }
-.faq-item[open] summary i::before, .faq-item[open] summary i::after { background: var(--red); }
+/* The Apollo mark stands in for the usual plus sign. Closed it points up in white; opening a question
+   "fires" it: a quick crouch, a shot upward and a flip to point down at the answer, now in red, while
+   the ring ripples out once. Closing turns it back up. */
+.faq-item summary i { flex: none; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; position: relative; display: grid; place-items: center; color: var(--ink); transition: border-color .3s, color .3s; }
+.faq-item summary i::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid var(--red); opacity: 0; pointer-events: none; }
+.faq-item summary i svg { width: 15px; height: 15px; fill: currentColor; transition: transform .45s var(--ease); }
+.faq-item summary:hover i { border-color: rgba(255,255,255,.5); }
+.faq-item[open] summary i { border-color: var(--red); color: var(--red-text); }
+.faq-item[open] summary i svg { transform: rotate(180deg); animation: faq-shoot .6s cubic-bezier(.22, 1, .36, 1); }
+.faq-item[open] summary i::after { animation: faq-ring .7s ease-out; }
+@keyframes faq-shoot { 0% { transform: translateY(0) scale(1); } 22% { transform: translateY(3px) scale(.78); } 62% { transform: translateY(-6px) rotate(180deg) scale(1.2); } 100% { transform: rotate(180deg) scale(1); } }
+@keyframes faq-ring { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(1.9); opacity: 0; } }
 .faq-item p { margin: 0; padding: 0 0 24px; color: var(--muted); max-width: 40em; line-height: 1.6; animation: faq-in .45s var(--ease); }
 @keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
@@ -448,6 +455,7 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 /* ---------- Motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
   .marquee-track, .scroll-cue i, .live-pulse::before, .nav-live i, .live-bubble i, .live-panel-head h2::before { animation: none; transform: none !important; }
+  .faq-item summary i svg, .faq-item summary i::after { animation: none; }
   .beacon-on, .loader-skip { opacity: 1; }
   .beacon-halo { opacity: .9; }
   .beacon-spill { opacity: .85; }
