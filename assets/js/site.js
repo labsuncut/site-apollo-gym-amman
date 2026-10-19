@@ -529,7 +529,8 @@
   (function apolloArrow() {
     // The arrow is tied to the page scroll: scroll down and the string draws, the arrow flies along the
     // line lighting each year, then thuds into the 2026 target; scroll up and it comes back to the bow.
-    // On a laptop the story strip slides sideways to keep the arrow tip in view.
+    // On a laptop the story strip slides sideways to keep the arrow tip in view, and the flight ends while
+    // the strip still sits in the upper half of the screen, so the thud on 2026 happens in view.
     const q = quiver, last = q.ms[q.ms.length - 1], sc = $('#timeline-scroll');
     const shudder = () => { const o = { t: 0 }; gsap.to(o, { t: 1, duration: .6, ease: 'none', onUpdate: () => { q.svgA.style.rotate = `${Math.sin(o.t * 26) * 5 * (1 - o.t)}deg`; }, onComplete: () => { q.svgA.style.rotate = ''; } }); };
     const hit = () => { last.classList.add('lit', 'hit'); shudder(); };
@@ -543,7 +544,7 @@
     };
     let lastTip = 0;
     q.tl.classList.add('arrow-ready'); last.classList.remove('hit'); q.measure(); q.draw(q.REST); q.place(q.REST);
-    ScrollTrigger.create({ trigger: q.tl, start: () => q.vertical() ? 'top 70%' : 'top 78%', end: () => q.vertical() ? 'bottom 72%' : 'bottom 30%', scrub: .6, onUpdate: (st) => {
+    ScrollTrigger.create({ trigger: q.tl, start: () => q.vertical() ? 'top 70%' : 'top 78%', end: () => q.vertical() ? 'bottom 72%' : 'top 30%', scrub: .6, onUpdate: (st) => {
       const p = st.progress, g = q.geo, end = g.target - q.ARROW;
       if (p < .07) { const k = p / .07; q.draw(q.REST * (1 - k)); q.place(q.REST * (1 - k)); last.classList.remove('hit'); q.trail.style.opacity = 0; follow(); return; }
       q.draw(q.REST);
