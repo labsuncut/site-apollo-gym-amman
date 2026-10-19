@@ -66,18 +66,34 @@
   // ---------- Programs ----------
   $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
     const [name, text] = p[lang];
-    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" tabindex="0" role="button" aria-pressed="${i === 0}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>`;
+    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><div class="program-desc" id="program-desc-${i}"><p>${esc(text)}</p></div><button class="program-arrow" type="button" aria-expanded="false" aria-controls="program-desc-${i}" aria-label="${esc(T.programs_about)} ${esc(name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
   }).join('');
   // The photo panel: one image per program, stacked; the active one fades in. Hover or keyboard focus picks it.
   $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" alt="" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
   const stageImgs = $$('#program-stage img'), stageLabel = $('#program-stage-label');
   const pickProgram = (i) => {
-    $$('.program').forEach((r, k) => { r.classList.toggle('is-active', k === i); r.setAttribute('aria-pressed', k === i); });
+    $$('.program').forEach((r, k) => r.classList.toggle('is-active', k === i));
     stageImgs.forEach((im, k) => im.classList.toggle('is-active', k === i));
     stageLabel.textContent = `${pad(i + 1)} · ${PROGRAMS[i][lang][0]}`;
   };
   pickProgram(0);
-  $$('.program').forEach((row) => { ['mouseenter', 'focus', 'click'].forEach((ev) => row.addEventListener(ev, () => pickProgram(+row.dataset.i))); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickProgram(+row.dataset.i); } }); });
+  // The list shows names only. The arrow opens the one-line description (hover or focus on a laptop,
+  // a tap on a phone); leaving the row closes it again. Hovering a row still swaps the side photo.
+  const canHover = window.matchMedia('(hover: hover)').matches;
+  const openProgram = (i) => $$('.program').forEach((r, k) => { const on = k === i; r.classList.toggle('is-open', on); $('.program-arrow', r).setAttribute('aria-expanded', on); });
+  $$('.program').forEach((row) => {
+    const i = +row.dataset.i, arrow = $('.program-arrow', row);
+    row.addEventListener('mouseenter', () => pickProgram(i));
+    if (canHover) { // on touch screens a tap fakes enter/leave, so hover only drives it where a real pointer exists
+      row.addEventListener('mouseleave', () => openProgram(-1));
+      arrow.addEventListener('mouseenter', () => openProgram(i));
+    }
+    arrow.addEventListener('focus', () => { pickProgram(i); openProgram(i); });
+    arrow.addEventListener('blur', () => openProgram(-1));
+    let wasOpen = false; // read before focus opens it, so a tap on an open arrow closes it
+    arrow.addEventListener('pointerdown', () => { wasOpen = row.classList.contains('is-open'); }, { passive: true });
+    arrow.addEventListener('click', () => { pickProgram(i); openProgram(wasOpen ? -1 : i); wasOpen = false; });
+  });
   $('#amenities').innerHTML = T.amenities.map((a) => `<li>${esc(a)}</li>`).join('');
 
   // ---------- Ethos ----------
@@ -100,7 +116,7 @@
     const tl = $('#timeline'), fill = $('#timeline-fill');
     tl.classList.add('has-bow');
     const ms = $$('.milestone', tl); ms[ms.length - 1].classList.add('is-target'); ms[0].style.scrollSnapAlign = 'none'; // the bow is the first stop
-    tl.insertAdjacentHTML('afterbegin', `<button class="archer" type="button" aria-label="${esc(T.story_shoot)}"><svg viewBox="0 0 60 96" aria-hidden="true"><defs><linearGradient id="bow-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d6b70"/><stop offset=".5" stop-color="#f4f2ef"/><stop offset="1" stop-color="#6d6b70"/></linearGradient></defs><path class="bow-string" id="bow-string" d="M22 4 L22 48 L22 92"/><path class="bow-limb" d="M15 1 Q19 5 22 4 C34 16 44 32 42 48 C44 64 34 80 22 92 Q19 91 15 95"/><rect class="bow-grip" x="39" y="40" width="7" height="16" rx="2.5"/></svg></button>
+    tl.insertAdjacentHTML('afterbegin', `<span class="archer" aria-hidden="true"><svg viewBox="0 0 60 96"><defs><linearGradient id="bow-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d6b70"/><stop offset=".5" stop-color="#f4f2ef"/><stop offset="1" stop-color="#6d6b70"/></linearGradient></defs><path class="bow-string" id="bow-string" d="M22 4 L22 48 L22 92"/><path class="bow-limb" d="M15 1 Q19 5 22 4 C34 16 44 32 42 48 C44 64 34 80 22 92 Q19 91 15 95"/><rect class="bow-grip" x="39" y="40" width="7" height="16" rx="2.5"/></svg></span>
       <i class="arrow-trail" id="arrow-trail" aria-hidden="true"></i>
       <div class="arrow-fly" id="arrow-fly" aria-hidden="true"><svg viewBox="0 0 132 24"><defs><linearGradient id="arrow-head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a9690"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M3 12 L12 3 L30 3 L24 12 Z M3 12 L12 21 L30 21 L24 12 Z" fill="#d41f2c"/><path d="M8 12 L28 12" stroke="#ff2d3f" stroke-width="1"/><rect x="0" y="10.5" width="5" height="3" rx="1" fill="#f4f2ef"/><path d="M5 12 L114 12" stroke="#d9d5cf" stroke-width="2" stroke-linecap="round"/><path d="M112 5 L132 12 L112 19 L116 12 Z" fill="url(#arrow-head)"/></svg></div>`);
     const archer = $('.archer', tl), string = $('#bow-string'), arrow = $('#arrow-fly'), trail = $('#arrow-trail'), svgA = $('svg', arrow);
@@ -135,6 +151,8 @@
   (function storyStrip() {
     const sc = $('#timeline-scroll');
     const step = () => Math.max(224, sc.clientWidth * .6);
+    sc.setAttribute('aria-label', T.story_title);
+    sc.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); sc.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * step(), behavior: calm ? 'auto' : 'smooth' }); } });
     const atEnd = () => sc.classList.toggle('is-end', Math.abs(sc.scrollLeft) + sc.clientWidth >= sc.scrollWidth - 4);
     $('#story-prev').addEventListener('click', () => sc.scrollBy({ left: -step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' }));
     $('#story-next').addEventListener('click', () => sc.scrollBy({ left: step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' }));
@@ -150,13 +168,56 @@
     const card = (q) => `<blockquote class="quote"><p>${esc(q[lang])}</p><cite><b>${esc(q.name)}</b><span>${esc(q.role[lang])}</span></cite></blockquote>`;
     const html = QUOTES.map(card).join('');
     if (QUOTES.length >= 3 && !calm) {
+      // An endless row that drifts on its own, but the reader is in charge: drag or flick it (mouse or
+      // finger), use a trackpad or the arrows, and it goes exactly where you send it. It picks the drift
+      // back up a few seconds after you let go. The cards are laid twice so the loop never shows a seam.
       track.classList.add('is-ticker');
-      track.innerHTML = `<div class="quotes-track" style="--dur:${QUOTES.length * 9}s">${html}${html}</div>`;
+      track.innerHTML = `<div class="quotes-track">${html}${html}</div>`;
       track.setAttribute('aria-label', T.members_title);
-      // A finger on the ticker pauses it, so a review can be read on a phone.
+      nav.hidden = false;
+      $('#quotes-prev').setAttribute('aria-label', T.quotes_prev); $('#quotes-next').setAttribute('aria-label', T.quotes_next);
       const tr = $('.quotes-track', track);
-      track.addEventListener('pointerdown', () => { tr.style.animationPlayState = 'paused'; }, { passive: true });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => track.addEventListener(ev, () => { tr.style.animationPlayState = ''; }, { passive: true }));
+      const dir = rtl ? -1 : 1; // which way "forward" moves on screen
+      const DRIFT = 85; // px per second when nobody is touching it
+      let x = 0, vel = 0, half = 0, idle = 0, drag = null, raf = 0, prevT = 0, step = 460;
+      const measure = () => { half = tr.scrollWidth / 2; const c = $('.quote', tr); step = c ? c.getBoundingClientRect().width + 20 : 460; };
+      const paint = () => { x = ((x % half) + half) % half; tr.style.transform = `translate3d(${-x * dir}px,0,0)`; };
+      const tick = (now) => {
+        const dt = Math.min(48, now - prevT) / 1000; prevT = now;
+        if (!drag) {
+          if (Math.abs(vel) > 8) { x += vel * dt; vel *= Math.pow(0.0025, dt); } // flick momentum, dies in ~1.5 s
+          else if (now > idle) x += DRIFT * dt; // calm drift
+          paint();
+        }
+        raf = requestAnimationFrame(tick);
+      };
+      const rest = (ms) => { idle = performance.now() + ms; };
+      const nudge = (n) => { vel = 0; rest(4000); const from = x, o = { t: 0 }; gsap.to(o, { t: 1, duration: .55, ease: 'power3.out', onUpdate: () => { x = from + n * step * o.t; paint(); } }); };
+      const begin = (e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; drag = { x: e.clientX, y: e.clientY, start: x, moved: false, samples: [[performance.now(), e.clientX]] }; vel = 0; track.classList.add('is-dragging'); };
+      const move = (e) => {
+        if (!drag) return;
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.moved) { if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return; if (Math.abs(dy) > Math.abs(dx)) { drag = null; track.classList.remove('is-dragging'); return; } drag.moved = true; track.setPointerCapture(e.pointerId); }
+        const now = performance.now(); drag.samples.push([now, e.clientX]); while (drag.samples.length > 2 && now - drag.samples[0][0] > 90) drag.samples.shift();
+        x = drag.start - dx * dir; paint();
+      };
+      const release = (e) => {
+        if (!drag) return;
+        const a = drag.samples[0], b = drag.samples[drag.samples.length - 1];
+        const v = b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0; // px/s, screen direction
+        vel = drag.moved ? -v * dir : 0; drag = null; track.classList.remove('is-dragging'); rest(3500);
+        if (e.pointerId !== undefined && track.hasPointerCapture && track.hasPointerCapture(e.pointerId)) track.releasePointerCapture(e.pointerId);
+      };
+      track.addEventListener('pointerdown', begin);
+      track.addEventListener('pointermove', move);
+      track.addEventListener('pointerup', release); track.addEventListener('pointercancel', release);
+      track.addEventListener('click', (e) => { if (track.classList.contains('is-dragging')) e.preventDefault(); }, true);
+      track.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { e.preventDefault(); vel = 0; x += e.deltaX * dir; paint(); rest(3500); } }, { passive: false });
+      track.addEventListener('mouseenter', () => rest(2500)); track.addEventListener('mousemove', () => rest(2500));
+      $('#quotes-prev').addEventListener('click', () => nudge(-1));
+      $('#quotes-next').addEventListener('click', () => nudge(1));
+      addEventListener('resize', measure, { passive: true });
+      measure(); prevT = performance.now(); raf = requestAnimationFrame(tick);
       return;
     }
     track.innerHTML = html;
@@ -465,49 +526,37 @@
   // whole line (the strip follows it), every year lights as it passes and the arrow thuds into the
   // target on the last year. Tap the bow to shoot again. Phone: the arrow rides down the line with your scroll.
   (function apolloArrow() {
+    // The arrow is tied to the page scroll: scroll down and the string draws, the arrow flies along the
+    // line lighting each year, then thuds into the 2026 target; scroll up and it comes back to the bow.
+    // On a laptop the story strip slides sideways to keep the arrow tip in view.
     const q = quiver, last = q.ms[q.ms.length - 1], sc = $('#timeline-scroll');
-    let shot = null;
-    const reset = () => { q.tl.classList.add('arrow-ready'); last.classList.remove('hit'); q.measure(); q.draw(q.REST); q.place(q.REST); };
     const shudder = () => { const o = { t: 0 }; gsap.to(o, { t: 1, duration: .6, ease: 'none', onUpdate: () => { q.svgA.style.rotate = `${Math.sin(o.t * 26) * 5 * (1 - o.t)}deg`; }, onComplete: () => { q.svgA.style.rotate = ''; } }); };
     const hit = () => { last.classList.add('lit', 'hit'); shudder(); };
-    const follow = () => { // keep the arrow tip in view while the strip is scrollable
-      if (sc.scrollWidth <= sc.clientWidth + 2) return;
+    const follow = () => { // keep the tip between 30% and 65% of the strip while it is scrollable
+      if (q.vertical() || sc.scrollWidth <= sc.clientWidth + 2) return;
       const a = q.arrow.getBoundingClientRect(), b = sc.getBoundingClientRect();
-      const tipX = rtl ? a.left : a.right, mark = rtl ? b.right - b.width * .62 : b.left + b.width * .62;
-      const over = rtl ? mark - tipX : tipX - mark;
-      if (over > 0) sc.scrollLeft += rtl ? -over : over;
+      const tip = rtl ? b.right - a.left : a.right - b.left; // tip position from the strip's start edge
+      let shift = 0;
+      if (tip > b.width * .65) shift = tip - b.width * .65; else if (tip < b.width * .3) shift = tip - b.width * .3;
+      if (shift) sc.scrollLeft += rtl ? -shift : shift;
     };
-    const shoot = () => {
-      if (shot) shot.kill(); reset();
-      sc.scrollTo({ left: 0, behavior: 'auto' });
-      const s = { pull: q.REST, nock: q.REST, t: 0 }, g = q.geo, end = g.target - q.ARROW, flight = 1.25 + (end / 1800);
-      let prevTip = q.REST + q.ARROW;
-      shot = gsap.timeline({ onComplete: () => { shot = null; } })
-        .to(s, { pull: 0, duration: .85, ease: 'power2.inOut', onUpdate: () => { q.draw(s.pull); q.place(s.pull); } })
-        .to(s, { pull: q.REST, duration: .5, ease: 'elastic.out(1.2, .25)', onUpdate: () => q.draw(s.pull) }, '+=.12')
-        .fromTo(s, { nock: 0, t: 0 }, { nock: end, t: 1, duration: flight, ease: 'power2.out', onUpdate: () => {
-          const tip = q.place(s.nock, Math.sin(s.t * 34) * 2.4 * (1 - s.t)); // archer's paradox: a fading flex
-          const speed = Math.abs(tip - prevTip); prevTip = tip;
-          q.trail.style.opacity = Math.min(1, speed / 14);
-          const tx = tip - 150; q.trail.style.transform = `translate3d(${rtl ? -tx : tx}px,0,0)`;
-          follow();
-        }, onComplete: () => { q.trail.style.opacity = 0; hit(); } }, '<');
-    };
-    if (q.vertical()) {
-      reset();
-      ScrollTrigger.create({ trigger: q.tl, start: 'top 70%', end: 'bottom 72%', scrub: .5, onUpdate: (st) => {
-        const p = st.progress, g = q.geo, end = g.target - q.ARROW;
-        if (p < .07) { const k = p / .07; q.draw(q.REST * (1 - k)); q.place(q.REST * (1 - k)); last.classList.remove('hit'); return; }
-        q.draw(q.REST);
-        const k = (p - .07) / .93; q.place(end * k);
-        if (k >= .995 && !last.classList.contains('hit')) hit();
-        if (k < .97) last.classList.remove('hit');
-      }, onRefresh: () => q.measure() });
-    } else {
-      reset();
-      ScrollTrigger.create({ trigger: q.tl, start: 'top 72%', once: true, onEnter: shoot });
-      q.archer.addEventListener('click', shoot);
-    }
+    let lastTip = 0;
+    q.tl.classList.add('arrow-ready'); last.classList.remove('hit'); q.measure(); q.draw(q.REST); q.place(q.REST);
+    ScrollTrigger.create({ trigger: q.tl, start: () => q.vertical() ? 'top 70%' : 'top 78%', end: () => q.vertical() ? 'bottom 72%' : 'bottom 30%', scrub: .6, onUpdate: (st) => {
+      const p = st.progress, g = q.geo, end = g.target - q.ARROW;
+      if (p < .07) { const k = p / .07; q.draw(q.REST * (1 - k)); q.place(q.REST * (1 - k)); last.classList.remove('hit'); q.trail.style.opacity = 0; follow(); return; }
+      q.draw(q.REST);
+      const k = (p - .07) / .93, nock = end * k;
+      const tip = q.place(nock, Math.sin(k * 34) * 2.4 * (1 - k));
+      if (!q.vertical()) { // the trail glows with speed and fades when the arrow rests
+        const speed = Math.abs(tip - lastTip); lastTip = tip;
+        q.trail.style.opacity = k > .02 && k < .995 ? Math.min(1, speed / 10) : 0;
+        const tx = tip - 150; q.trail.style.transform = `translate3d(${rtl ? -tx : tx}px,0,0)`;
+      }
+      follow();
+      if (k >= .995 && !last.classList.contains('hit')) hit();
+      if (k < .97) last.classList.remove('hit');
+    }, onRefresh: () => q.measure() });
   })();
 
   // ---------- Ethos cards shrink as the next one covers them ----------
