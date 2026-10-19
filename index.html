@@ -68,9 +68,9 @@
 
   <header class="site-header" id="top">
     <div class="wrap header-row">
-      <a class="logo" href="#top" aria-label="Apollo Training Facility, home">
+      <a class="logo" href="#top">
         <svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
-        <span class="logo-word">APOLLO<small>Training Facility</small></span>
+        <span class="logo-word">APOLLO <small>Training Facility</small></span>
       </a>
       <nav class="nav" aria-label="Main">
         <a href="#family" data-t="nav_family"></a>
@@ -179,7 +179,7 @@
           <button class="tour-btn" id="tour-next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
       </div>
-      <div class="tour-viewport" id="tour-viewport" tabindex="0" aria-roledescription="carousel" data-lenis-prevent-touch>
+      <div class="tour-viewport" id="tour-viewport" tabindex="0" role="region" aria-label="Photos of the gym" aria-roledescription="carousel" data-lenis-prevent-touch>
         <div class="tour-track" id="tour-track"></div>
       </div>
       <div class="tour-progress wrap"><span id="tour-index">01</span><i><b id="tour-bar"></b></i><span id="tour-total"></span><button class="btn btn-ghost btn-small tour-more" id="tour-more" type="button" data-t="space_more"></button></div>
@@ -253,7 +253,7 @@
           <p class="lead reveal" data-t="membership_text"></p>
           <ul class="includes reveal" id="includes"></ul>
         </div>
-        <aside class="enquire reveal">
+        <div class="enquire reveal">
           <svg class="enquire-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
           <h3 data-t="enquire_title"></h3>
           <p data-t="enquire_text"></p>
@@ -263,7 +263,7 @@
           </div>
           <p class="enquire-lines" id="enquire-lines"></p>
           <p class="enquire-note" data-t="enquire_note"></p>
-        </aside>
+        </div>
       </div>
     </section>
 
@@ -366,7 +366,7 @@
       <a class="text-link live-tab" id="live-tab" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_open_tab"></a>
     </div>
   </div>
-  <a class="call-bar tel-link" href="#" data-t="enquire_call"></a>
+  <nav class="call-bar-wrap" aria-label="Call Apollo"><a class="call-bar tel-link" href="#" data-t="enquire_call"></a></nav>
 
   <script src="assets/js/vendor/gsap.min.js"></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js"></script>

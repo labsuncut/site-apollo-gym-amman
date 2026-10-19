@@ -60,23 +60,24 @@
   $('#tour-track').innerHTML = SPACE.slice(0, shown).map(tourItem).join('');
   $('#tour-total').textContent = pad(shown);
   $('#tour-more').hidden = shown >= SPACE.length;
+  $('#tour-viewport').setAttribute('aria-label', T.space_photos);
   $('#tour-prev').setAttribute('aria-label', T.space_prev); $('#tour-next').setAttribute('aria-label', T.space_next);
 
   // ---------- Programs ----------
   $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
     const [name, text] = p[lang];
-    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" tabindex="0" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>`;
+    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" tabindex="0" role="button" aria-pressed="${i === 0}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><p>${esc(text)}</p><span class="program-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>`;
   }).join('');
   // The photo panel: one image per program, stacked; the active one fades in. Hover or keyboard focus picks it.
   $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" alt="" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
   const stageImgs = $$('#program-stage img'), stageLabel = $('#program-stage-label');
   const pickProgram = (i) => {
-    $$('.program').forEach((r, k) => r.classList.toggle('is-active', k === i));
+    $$('.program').forEach((r, k) => { r.classList.toggle('is-active', k === i); r.setAttribute('aria-pressed', k === i); });
     stageImgs.forEach((im, k) => im.classList.toggle('is-active', k === i));
     stageLabel.textContent = `${pad(i + 1)} · ${PROGRAMS[i][lang][0]}`;
   };
   pickProgram(0);
-  $$('.program').forEach((row) => { ['mouseenter', 'focus'].forEach((ev) => row.addEventListener(ev, () => pickProgram(+row.dataset.i))); });
+  $$('.program').forEach((row) => { ['mouseenter', 'focus', 'click'].forEach((ev) => row.addEventListener(ev, () => pickProgram(+row.dataset.i))); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickProgram(+row.dataset.i); } }); });
   $('#amenities').innerHTML = T.amenities.map((a) => `<li>${esc(a)}</li>`).join('');
 
   // ---------- Ethos ----------
@@ -371,7 +372,7 @@
   }));
 
   // Heading splits (lines slide up when they come into view)
-  const splits = $$('.split').map((el) => SplitText.create(el, { type: 'lines', linesClass: 'line' }));
+  const splits = $$('.split').map((el) => SplitText.create(el, { type: 'lines', linesClass: 'line', aria: el.matches('h1,h2,h3,h4,h5,h6') ? 'auto' : 'hidden' }));
   splits.forEach((s) => {
     const inner = s.lines.map((line) => { const span = document.createElement('span'); span.style.display = 'block'; span.innerHTML = line.innerHTML; line.innerHTML = ''; line.appendChild(span); return span; });
     gsap.from(inner, { yPercent: 110, duration: 1, ease: 'power4.out', stagger: .08, scrollTrigger: { trigger: s.elements[0], start: 'top 85%' } });

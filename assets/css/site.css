@@ -48,6 +48,8 @@ h3 { font-size: 1.1rem; font-weight: 800; }
 html[lang="ar"] .kicker { letter-spacing: 0; }
 .lead { color: var(--muted); max-width: 34em; font-size: 1.15rem; margin: 0 0 40px; }
 .text-link { color: var(--red-text); font-weight: 700; }
+.map-link { display: inline-block; padding: 8px 0; } /* tap target at least 24px tall */
+.program:focus-visible { outline: 2px solid var(--red-text); outline-offset: 4px; border-radius: 6px; }
 .eyebrow { color: var(--red-text); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; margin: 0 0 18px; }
 html[lang="ar"] .eyebrow { letter-spacing: 0; }
 .ico { width: 20px; height: 20px; fill: currentColor; }
@@ -260,7 +262,7 @@ html[lang="ar"] .milestone h3 { text-transform: none; letter-spacing: 0; font-si
 .timeline.has-bow .archer { scroll-snap-align: start; }
 .timeline.has-bow .milestone::before { top: -42px; transition: transform .5s var(--ease), box-shadow .5s var(--ease), background .3s; }
 .timeline.has-bow .milestone b { transition: color .6s var(--ease), opacity .6s var(--ease); }
-.timeline.arrow-ready .milestone:not(.lit) b { opacity: .28; }
+.timeline.arrow-ready .milestone:not(.lit) b { color: #6e6a66; } /* unlit year: dim but still readable (3.7:1, large text) */
 .timeline.arrow-ready .milestone:not(.lit)::before { background: #3a3a3e; }
 .timeline .milestone.lit::before { animation: ms-ignite .7s var(--ease); box-shadow: 0 0 0 6px var(--bg), 0 0 18px 2px rgba(255,45,63,.55); }
 @keyframes ms-ignite { 0% { transform: scale(1); } 35% { transform: scale(1.9); } 100% { transform: scale(1); } }
