@@ -62,6 +62,7 @@ const TEXT = {
     enquire_title: 'Enquire about membership', enquire_short: 'Enquire on WhatsApp',
     enquire_text: 'The quickest way in is a call. The team will tell you what membership looks like for you and invite you to visit.',
     enquire_call: 'Call Apollo', enquire_wa: 'Speak to the team on WhatsApp',
+    enquire_landline: 'Gym line', enquire_mobile: 'Mobile',
     enquire_note: 'Open Saturday to Thursday from 6 AM, Friday from 11 AM.',
     faq_kicker: '08 · FAQ', faq_title: 'Good questions',
     faq_text: 'The things people ask before their first visit. Anything else, send a message.',
@@ -80,7 +81,7 @@ const TEXT = {
     franchise_cta: 'Ask on WhatsApp', franchise_mail: 'Email the team',
     final_word: 'Rise.', final_title: 'Your place in the family starts with a conversation.', final_cta: 'Enquire about membership',
     footer_name: 'Apollo Training Facility', footer_addr: 'Mecca Street, Amman',
-    footer_credit: 'Site by LabsUncut',
+    footer_credit: 'By FellowFlow',
     wa_msg: 'Hi Apollo! I saw the website and would like to come and see the place.',
     wa_member_msg: 'Hi Apollo! I saw the website and would like to ask about membership.'
   },
@@ -123,6 +124,7 @@ const TEXT = {
     enquire_title: 'استفسر عن العضوية', enquire_short: 'استفسر على واتساب',
     enquire_text: 'أسرع طريق هو مكالمة. الفريق بيحكيلك كيف بتكون العضوية إلك وبيدعوك تزور المكان.',
     enquire_call: 'اتصل بأبولو', enquire_wa: 'احكِ مع الفريق على واتساب',
+    enquire_landline: 'خط النادي', enquire_mobile: 'موبايل',
     enquire_note: 'نفتح من السبت إلى الخميس من ٦ صباحاً، والجمعة من ١١ صباحاً.',
     faq_kicker: '٠٨ · الأسئلة الشائعة', faq_title: 'أسئلة بمحلها',
     faq_text: 'الأشياء التي يسألها الناس قبل أول زيارة. أي شيء آخر، ابعث رسالة.',
@@ -141,7 +143,7 @@ const TEXT = {
     franchise_cta: 'اسأل على واتساب', franchise_mail: 'راسل الفريق',
     final_word: 'ارتقِ.', final_title: 'مكانك في العائلة يبدأ بحديث.', final_cta: 'استفسر عن العضوية',
     footer_name: 'أبولو للتدريب', footer_addr: 'شارع مكة، عمّان',
-    footer_credit: 'الموقع من LabsUncut',
+    footer_credit: 'من FellowFlow',
     wa_msg: 'مرحباً أبولو! شفت الموقع وحاب أجي أشوف المكان.',
     wa_member_msg: 'مرحباً أبولو! شفت الموقع وحاب أسأل عن العضوية.'
   }

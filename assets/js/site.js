@@ -240,7 +240,8 @@
   // ---------- FAQ, membership, family ----------
   $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
   $('#includes').innerHTML = T.includes.map((x) => `<li>${esc(x)}</li>`).join('');
-  $('#enquire-lines').innerHTML = [[BUSINESS.phone, BUSINESS.phoneDisplay], ['+' + BUSINESS.whatsapp, BUSINESS.mobileDisplay]].map(([n, d]) => `<a href="tel:${esc(n)}" dir="ltr">${esc(d)}</a>`).join('<span aria-hidden="true"> · </span>');
+  $('#enquire-lines').innerHTML = [[T.enquire_landline, BUSINESS.phone, BUSINESS.phoneDisplay], [T.enquire_mobile, '+' + BUSINESS.whatsapp, BUSINESS.mobileDisplay]]
+    .map(([l, n, d]) => `<a class="enquire-line" href="tel:${esc(n)}"><span>${esc(l)}</span><b dir="ltr">${esc(d)}</b></a>`).join('');
   $('#family-grid').innerHTML = FAMILY.map((f) => {
     const [title, text] = f[lang];
     const media = f.img ? `<img src="${esc(f.img.src)}" width="${f.img.w}" height="${f.img.h}" alt="${esc(title)}" loading="lazy" style="object-position:${esc(f.img.focus || '50% 50%')}">`
