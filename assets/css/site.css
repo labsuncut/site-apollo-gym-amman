@@ -11,6 +11,7 @@
 
 :root {
   --red: #d41f2c;          /* Apollo red, sampled from the logo */
+  --red-text: #ef4450;     /* Apollo red brightened for small text: 5:1 on the black floor (WCAG AA) */
   --neon: #ff2d3f;         /* the neon sign */
   --ember: #ff6a2a;        /* sunrise */
   --bg: #0a0a0b;
@@ -43,11 +44,11 @@ h3 { font-size: 1.1rem; font-weight: 800; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .skip { position: absolute; inset-inline-start: 8px; top: 8px; background: var(--red); color: #fff; padding: 8px 12px; z-index: 100; transform: translateY(-200%); }
 .skip:focus { transform: none; }
-.kicker { color: var(--red); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; font-size: .78rem; margin: 0 0 14px; }
+.kicker { color: var(--red-text); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; font-size: .78rem; margin: 0 0 14px; }
 html[lang="ar"] .kicker { letter-spacing: 0; }
 .lead { color: var(--muted); max-width: 34em; font-size: 1.15rem; margin: 0 0 40px; }
-.text-link { color: var(--red); font-weight: 700; }
-.eyebrow { color: var(--red); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; margin: 0 0 18px; }
+.text-link { color: var(--red-text); font-weight: 700; }
+.eyebrow { color: var(--red-text); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; margin: 0 0 18px; }
 html[lang="ar"] .eyebrow { letter-spacing: 0; }
 .ico { width: 20px; height: 20px; fill: currentColor; }
 
@@ -183,7 +184,7 @@ html[lang="ar"] .tour-hint { letter-spacing: 0; }
 .tour-item img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 1.2s var(--ease); }
 .tour-item:hover img { transform: scale(1.02); }
 .tour-item figcaption { position: absolute; left: 22px; right: 22px; bottom: 18px; display: flex; align-items: baseline; gap: 14px; font-weight: 800; font-size: 1.05rem; text-shadow: 0 2px 12px rgba(0,0,0,.7); }
-.tour-item figcaption b { font-family: var(--display); color: var(--red); font-size: .85rem; letter-spacing: .1em; }
+.tour-item figcaption b { font-family: var(--display); color: var(--red-text); font-size: .85rem; letter-spacing: .1em; }
 .tour-progress { display: flex; align-items: center; gap: 16px; margin-top: 28px; font-family: var(--display); font-weight: 800; font-size: .85rem; letter-spacing: .1em; color: var(--muted); }
 .tour-progress i { flex: 1; height: 1px; background: var(--line); position: relative; }
 .tour-progress b { position: absolute; inset: 0; background: var(--red); transform: scaleX(0); transform-origin: left; }
@@ -212,7 +213,7 @@ html[dir="rtl"] .program.is-active h3 { transform: translateX(-8px); }
 html[lang="ar"] .program-stage-label { text-transform: none; letter-spacing: 0; }
 .amenities { list-style: none; margin: 40px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .amenities li { border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-size: .9rem; color: var(--muted); }
-.amenities li::before { content: '✓ '; color: var(--red); font-weight: 800; }
+.amenities li::before { content: '✓ '; color: var(--red-text); font-weight: 800; }
 
 /* ---------- Ethos: stacked sticky cards ---------- */
 .ethos-section { background: var(--bg2); }
@@ -220,6 +221,7 @@ html[lang="ar"] .program-stage-label { text-transform: none; letter-spacing: 0; 
 .ethos-card { position: relative; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 28px 26px; display: grid; gap: 12px; align-content: start; transition: border-color .3s, transform .4s var(--ease); }
 .ethos-card:hover { border-color: rgba(212,31,44,.5); transform: translateY(-3px); }
 .ethos-num { position: absolute; top: 22px; inset-inline-end: 24px; font-family: var(--display); font-weight: 900; font-size: 1.6rem; line-height: 1; color: var(--line); }
+.ethos-num::before { content: attr(data-n); } /* decorative ghost number, drawn by CSS so it is not read as text */
 .ethos-card h3 { font-family: var(--display); font-weight: 900; font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: .98; text-transform: uppercase; letter-spacing: -.02em; margin: 0; padding-inline-end: 2em; }
 html[lang="ar"] .ethos-card h3 { text-transform: none; letter-spacing: 0; line-height: 1.15; }
 .ethos-card h3 em { font-style: normal; color: var(--red); display: block; }
@@ -245,7 +247,7 @@ html[dir="rtl"] .timeline-line b { transform-origin: right; }
 .milestone { position: relative; }
 .milestone::before { content: ''; position: absolute; top: -42px; inset-inline-start: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 6px var(--bg); }
 .milestone b { display: block; font-family: var(--display); font-weight: 900; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1; letter-spacing: -.03em; }
-.milestone h3 { margin: 14px 0 6px; color: var(--red); text-transform: uppercase; letter-spacing: .1em; font-size: .8rem; }
+.milestone h3 { margin: 14px 0 6px; color: var(--red-text); text-transform: uppercase; letter-spacing: .1em; font-size: .8rem; }
 html[lang="ar"] .milestone h3 { text-transform: none; letter-spacing: 0; font-size: 1rem; }
 .milestone p { margin: 0; color: var(--muted); font-size: .98rem; }
 
@@ -373,7 +375,7 @@ html[lang="ar"] .visit-info h3 { letter-spacing: 0; font-size: .95rem; }
 .hours { border-collapse: collapse; width: 100%; max-width: 400px; }
 .hours th, .hours td { text-align: start; padding: 8px 0; border-bottom: 1px solid var(--line); font-weight: 500; }
 .hours th { color: var(--muted); width: 42%; }
-.hours tr.is-today th, .hours tr.is-today td { color: var(--red); font-weight: 800; }
+.hours tr.is-today th, .hours tr.is-today td { color: var(--red-text); font-weight: 800; }
 .hours tr.is-today th::after { content: ' · ' attr(data-today); font-size: .8em; }
 .contact-links { display: flex; flex-wrap: wrap; gap: 10px; }
 .contact-lines { color: var(--muted); font-size: .95rem; margin: 14px 0 0; line-height: 1.8; }
@@ -397,7 +399,7 @@ html[lang="ar"] .final-word { text-transform: none; letter-spacing: 0; line-heig
 .footer-row p { margin: 0; }
 .footer-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); font-size: .85rem; }
 html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
-.footer-credit { opacity: .6; }
+.footer-credit { color: var(--muted); }
 
 /* ---------- Sticky WhatsApp bar, phones only ---------- */
 .call-bar { display: none; }
@@ -424,7 +426,7 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 .live-pulse::before { animation: pulse 1.8s ease-out infinite; }
 @keyframes pulse { from { transform: scale(1); opacity: .8; } to { transform: scale(3.2); opacity: 0; } }
 .live-copy h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: clamp(1.4rem, 3vw, 2rem); }
-.live-copy p { margin: 0; opacity: .9; }
+.live-copy p { margin: 0; color: #fff; }
 .live-btn { background: #fff; color: var(--red); border-color: #fff; }
 .live-btn:hover { background: var(--bg); color: #fff; border-color: var(--bg); }
 .nav-live { display: inline-flex; align-items: center; gap: 8px; }

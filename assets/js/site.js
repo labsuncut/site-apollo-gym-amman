@@ -82,7 +82,7 @@
   // ---------- Ethos ----------
   $('#ethos-stack').innerHTML = ETHOS.map((e, i) => {
     const [a, b, text] = e[lang];
-    return `<article class="ethos-card"><span class="ethos-num">${pad(i + 1)}</span><h3>${esc(a)}<em>${esc(b)}</em></h3><p>${esc(text)}</p></article>`;
+    return `<article class="ethos-card"><span class="ethos-num" aria-hidden="true" data-n="${pad(i + 1)}"></span><h3>${esc(a)}<em>${esc(b)}</em></h3><p>${esc(text)}</p></article>`;
   }).join('');
   $('#values').innerHTML = T.values.map((v) => `<span>${esc(v)}</span>`).join('');
 
@@ -512,7 +512,7 @@
   // ---------- Ethos cards shrink as the next one covers them ----------
   $$('.ethos-card').forEach((card, i, all) => {
     if (i === all.length - 1) return;
-    gsap.to(card, { scale: .94, opacity: .5, ease: 'none', scrollTrigger: { trigger: all[i + 1], start: 'top 80%', end: 'top 20%', scrub: true } });
+    gsap.to(card, { scale: .96, ease: 'none', scrollTrigger: { trigger: all[i + 1], start: 'top 80%', end: 'top 20%', scrub: true } });
   });
 
   // ---------- Slogan strip: slow, steady drift; scrolling nudges it at most 1.4x, eased ----------
