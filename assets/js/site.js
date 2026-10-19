@@ -238,7 +238,7 @@
   })();
 
   // ---------- FAQ, membership, family ----------
-  $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
+  $('#faq-list').innerHTML = FAQ.map((f, i) => `<details class="faq-item reveal"${i === 0 ? ' open' : ''}><summary><span>${esc(f[lang][0])}</span><i aria-hidden="true"><svg viewBox="0 8 100 100"><use href="#mark"/></svg></i></summary><p>${esc(f[lang][1])}</p></details>`).join('');
   $('#includes').innerHTML = T.includes.map((x) => `<li>${esc(x)}</li>`).join('');
   $('#enquire-lines').innerHTML = [[T.enquire_landline, BUSINESS.phone, BUSINESS.phoneDisplay], [T.enquire_mobile, '+' + BUSINESS.whatsapp, BUSINESS.mobileDisplay]]
     .map(([l, n, d]) => `<a class="enquire-line" href="tel:${esc(n)}"><span>${esc(l)}</span><b dir="ltr">${esc(d)}</b></a>`).join('');
