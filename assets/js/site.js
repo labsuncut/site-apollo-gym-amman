@@ -56,7 +56,6 @@
   // ---------- Gallery: highlights first, the rest on request ----------
   const tourItem = (s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" width="${s.w}" height="${s.h}" style="object-position:${esc(s.focus)}" alt="${esc(s[lang])}" loading="${i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`;
   let shown = Math.min(SPACE_HIGHLIGHTS, SPACE.length);
-  $('#tour-track').innerHTML = SPACE.slice(0, shown).map(tourItem).join('');
   $('#tour-total').textContent = pad(shown);
   $('#tour-more').hidden = shown >= SPACE.length;
   $('#tour-viewport').setAttribute('aria-label', T.space_photos);
@@ -302,96 +301,99 @@
   const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
-  // ---------- Gallery controls: native horizontal scroll, arrows, keyboard, "more" ----------
-  // Vertical scrolling is never captured: the page always continues past the gallery.
+  // ---------- Gallery: an endless row of photos that drifts on its own and follows your hand ----------
+  // Like the reviews, the gym guide moves by itself so the floor shows without a swipe. Touch keeps the
+  // approved slider feel: the track follows the finger 1:1 and the release glides exactly one photo at the
+  // finger's own speed, never half a photo. A mouse can drag or flick it the same way, a trackpad pushes it
+  // sideways, and the arrows and keyboard still step one photo. The photos are laid twice so the loop never
+  // shows a seam, and the drift picks up again a few seconds after you let go. Vertical scrolling is never
+  // captured: the page always continues past the gallery.
   const track = $('#tour-track'), viewport = $('#tour-viewport'), bar = $('#tour-bar'), idx = $('#tour-index');
-  // Distance between two neighbouring photos (width + gap + margins), so arrows and the counter move exactly one photo.
-  const step = () => { const [a, b] = $$('.tour-item'); return a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; };
-  const onSwipe = () => { const max = viewport.scrollWidth - viewport.clientWidth; const p = max ? Math.abs(viewport.scrollLeft) / max : 0; bar.style.transform = `scaleX(${p})`; idx.textContent = pad(p > .98 ? shown : Math.min(shown, Math.round(Math.abs(viewport.scrollLeft) / step()) + 1)); };
-  viewport.addEventListener('scroll', onSwipe, { passive: true }); onSwipe();
-  // Touch screens: the gallery is a true slider, not a scroll box. The track follows the finger 1:1,
-  // and on release a spring carries the finger's own speed into the next full photo, so the hand-off
-  // never jumps or brakes. Photos drift slightly inside their frames (parallax) so each one slides
-  // into place under the next like interlocking pieces. Never half a photo.
-  const slider = window.matchMedia('(pointer: coarse)').matches;
-  let at = 0, pos = 0, vel = 0, target = 0, raf = 0, gap = 0, max = 0, imgs = [];
-  const measure = () => { gap = step(); max = Math.max(0, track.scrollWidth - viewport.clientWidth); imgs = $$('.tour-item img', track); };
-  const shiftFor = (i) => Math.min(i * gap, max);
+  const DRIFT = isPhone() ? 55 : 80; // px per second when nobody is touching it
+  let at = 0, pos = 0, vel = 0, gap = 0, period = 0, imgs = [], idle = 0, anim = null, t = null, prevT = 0;
+  const build = () => {
+    const one = SPACE.slice(0, shown).map(tourItem).join('');
+    track.innerHTML = one + one.replace(/<figure class="tour-item"/g, '<figure class="tour-item is-copy" aria-hidden="true"');
+    $$('img', track).forEach((im) => { im.loading = 'eager'; im.draggable = false; });
+  };
+  const measure = () => { const [a, b] = $$('.tour-item', track); gap = a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; period = gap * shown; imgs = $$('.tour-item img', track); };
+  const norm = (x) => period ? ((x % period) + period) % period : x;
+  const nearest = () => Math.round(pos / (gap || 1));
+  const rest = (ms) => { idle = performance.now() + ms; };
   const paint = () => {
-    track.style.transform = `translate3d(${rtl ? pos : -pos}px,0,0)`;
+    const p = norm(pos);
+    track.style.transform = `translate3d(${rtl ? p : -p}px,0,0)`;
+    const n = ((Math.round(p / (gap || 1)) % shown) + shown) % shown;
+    idx.textContent = pad(n + 1); bar.style.transform = `scaleX(${Math.min(1, period > gap ? p / (period - gap) : 0)})`;
     if (calm) return;
     for (let i = 0; i < imgs.length; i++) { // image lags its frame by 18%: depth without extra motion
-      const d = (i * gap - pos) / (gap || 1); if (d < -1.5 || d > 1.5) continue;
+      const d = (i * gap - p) / (gap || 1); if (d < -1.5 || d > 1.5) continue;
       imgs[i].style.transform = `translate3d(${(rtl ? 1 : -1) * d * gap * 0.18}px,0,0) scale(1.2)`;
     }
   };
   // Release glide: starts at exactly the finger's speed (no jolt), picks up early, and lands softly
   // with a short tail. Blend of two curves, both ending at zero speed, chosen so the start speed matches.
-  const settle = () => {
-    cancelAnimationFrame(raf);
-    const x0 = pos, dist = target - x0;
-    if (Math.abs(dist) < 0.5) { pos = target; vel = 0; paint(); return; }
+  const settleTo = (i) => {
+    at = i; const x0 = pos, dist = i * gap - x0;
+    if (calm || Math.abs(dist) < 0.5) { pos = i * gap; vel = 0; anim = null; return; }
     const D = Math.max(300, Math.min(560, 280 + Math.abs(dist) * 0.75)); // ms, longer for longer trips
     const r = Math.max(0, Math.min(3, (vel * D) / dist)); // start slope in curve units (only toward target)
     const E = (u) => { const m = 1 - u; const soft = 1 - m * m * m * (1 + 3 * u), out = 1 - m * m * m; return (1 - r / 3) * soft + (r / 3) * out; };
     const dE = (u) => { const m = 1 - u; return (1 - r / 3) * 12 * u * m * m + (r / 3) * 3 * m * m; };
-    const t0 = performance.now();
-    const tick = (now) => {
-      const u = Math.min(1, (now - t0) / D);
-      pos = x0 + dist * E(u); vel = (dist * dE(u)) / D;
-      paint();
-      if (u < 1) raf = requestAnimationFrame(tick); else { pos = target; vel = 0; }
-    };
-    raf = requestAnimationFrame(tick);
+    anim = { x0, dist, D, E, dE, t0: performance.now() };
   };
-  const showAt = (i, animate = true) => {
-    at = Math.max(0, Math.min(shown - 1, i)); target = shiftFor(at);
-    bar.style.transform = `scaleX(${shown > 1 ? at / (shown - 1) : 0})`; idx.textContent = pad(at + 1);
-    if (animate && !calm) settle(); else { cancelAnimationFrame(raf); pos = target; vel = 0; paint(); }
+  const tick = (now) => {
+    const dt = Math.min(48, now - prevT) / 1000; prevT = now;
+    if (anim) {
+      const u = Math.min(1, (now - anim.t0) / anim.D);
+      pos = anim.x0 + anim.dist * anim.E(u); vel = (anim.dist * anim.dE(u)) / anim.D;
+      if (u >= 1) { pos = norm(anim.x0 + anim.dist); vel = 0; anim = null; }
+    } else if (!t && !calm && now > idle) pos = norm(pos + DRIFT * dt); // calm drift
+    paint();
+    requestAnimationFrame(tick);
   };
-  const go = (n) => slider ? showAt(at + n) : viewport.scrollBy({ left: n * step() * (rtl ? -1 : 1), behavior: calm ? 'auto' : 'smooth' });
-  if (slider) {
-    viewport.classList.add('is-slider');
-    $$('.tour-item img', track).forEach((im) => { im.loading = 'eager'; });
-    let t = null;
-    viewport.addEventListener('touchstart', (e) => {
-      cancelAnimationFrame(raf); measure(); // catch a photo mid-glide exactly where it is
-      const p = e.touches[0]; t = { x: p.clientX, y: p.clientY, from: pos, dir: 0, samples: [[performance.now(), p.clientX]] };
-      vel = 0;
-    }, { passive: true });
-    viewport.addEventListener('touchmove', (e) => {
-      if (!t) return; const p = e.touches[0]; const dx = p.clientX - t.x, dy = p.clientY - t.y;
-      if (!t.dir) { if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return; t.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
-      if (t.dir !== 'x') return;
-      e.preventDefault();
-      const now = performance.now(); t.samples.push([now, p.clientX]); while (t.samples.length > 2 && now - t.samples[0][0] > 90) t.samples.shift();
-      let next = t.from - (rtl ? -(p.clientX - t.x) : (p.clientX - t.x));
-      if (next < 0) next /= 3; else if (next > max) next = max + (next - max) / 3; // soft edges
-      pos = next; paint();
-    }, { passive: false });
-    const release = () => {
-      if (!t) return; const s = t.samples, a = s[0], b = s[s.length - 1]; const dir = t.dir; t = null;
-      if (dir !== 'x') { showAt(at); return; }
-      const fingerV = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0; // px per ms, screen direction
-      vel = rtl ? fingerV : -fingerV; // track velocity in "pos" units
-      const moved = pos - shiftFor(at);
-      let to = at;
-      if (Math.abs(moved) > 12 || Math.abs(vel) > 0.2) to = at + ((Math.abs(vel) > 0.2 ? vel : moved) > 0 ? 1 : -1);
-      showAt(to);
-    };
-    viewport.addEventListener('touchend', release, { passive: true });
-    viewport.addEventListener('touchcancel', release, { passive: true });
-    addEventListener('resize', () => { measure(); showAt(at, false); }, { passive: true });
-    measure(); showAt(0, false);
-  }
+  // One set of hand handlers for finger and mouse. x/y are screen coordinates.
+  const begin = (x, y) => { anim = null; measure(); pos = norm(pos); at = nearest(); t = { x, y, from: pos, dir: 0, samples: [[performance.now(), x]] }; vel = 0; };
+  const move = (x, y) => { // returns true once the gesture is horizontal (the caller then blocks page scroll)
+    if (!t) return false; const dx = x - t.x, dy = y - t.y;
+    if (!t.dir) { if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return false; t.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
+    if (t.dir !== 'x') return false;
+    const now = performance.now(); t.samples.push([now, x]); while (t.samples.length > 2 && now - t.samples[0][0] > 90) t.samples.shift();
+    pos = t.from - (rtl ? -dx : dx); paint();
+    return true;
+  };
+  const release = () => {
+    if (!t) return; const s = t.samples, a = s[0], b = s[s.length - 1]; const dir = t.dir; t = null; rest(4000);
+    if (dir !== 'x') { settleTo(at); return; }
+    const fingerV = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0; // px per ms, screen direction
+    vel = rtl ? fingerV : -fingerV; // track velocity in "pos" units
+    const moved = pos - at * gap;
+    let to = at;
+    if (Math.abs(moved) > 12 || Math.abs(vel) > 0.2) to = at + ((Math.abs(vel) > 0.2 ? vel : moved) > 0 ? 1 : -1);
+    settleTo(to);
+  };
+  viewport.classList.add('is-slider');
+  viewport.addEventListener('touchstart', (e) => { const p = e.touches[0]; begin(p.clientX, p.clientY); }, { passive: true });
+  viewport.addEventListener('touchmove', (e) => { const p = e.touches[0]; if (move(p.clientX, p.clientY)) e.preventDefault(); }, { passive: false });
+  viewport.addEventListener('touchend', release, { passive: true });
+  viewport.addEventListener('touchcancel', release, { passive: true });
+  viewport.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' || e.button !== 0) return; e.preventDefault(); begin(e.clientX, e.clientY); viewport.classList.add('is-dragging'); });
+  viewport.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; if (move(e.clientX, e.clientY) && !viewport.hasPointerCapture(e.pointerId)) viewport.setPointerCapture(e.pointerId); rest(2500); });
+  const mouseUp = (e) => { if (e.pointerType !== 'mouse') return; viewport.classList.remove('is-dragging'); release(); };
+  viewport.addEventListener('pointerup', mouseUp); viewport.addEventListener('pointercancel', mouseUp);
+  viewport.addEventListener('mouseenter', () => rest(2500));
+  viewport.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { e.preventDefault(); anim = null; pos = norm(pos + e.deltaX * (rtl ? -1 : 1)); paint(); rest(3500); } }, { passive: false });
+  const go = (n) => { anim = null; measure(); pos = norm(pos); vel = 0; rest(4000); settleTo(nearest() + n); };
   $('#tour-prev').addEventListener('click', () => go(-1));
   $('#tour-next').addEventListener('click', () => go(1));
   viewport.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });
   $('#tour-more').addEventListener('click', () => {
-    track.insertAdjacentHTML('beforeend', SPACE.slice(shown).map((s, i) => tourItem(s, shown + i)).join(''));
-    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true; slider ? (measure(), $$('.tour-item img', track).forEach((im) => { im.loading = 'eager'; }), showAt(at, false)) : onSwipe();
+    shown = SPACE.length; $('#tour-total').textContent = pad(shown); $('#tour-more').hidden = true;
+    build(); measure(); paint();
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
+  addEventListener('resize', () => { const i = nearest(); measure(); pos = i * gap; paint(); }, { passive: true });
+  build(); measure(); paint(); prevT = performance.now(); requestAnimationFrame(tick);
 
   // ---------- No motion: show everything and stop ----------
   if (!motion) {

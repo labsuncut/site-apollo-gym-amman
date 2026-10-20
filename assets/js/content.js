@@ -43,7 +43,7 @@ const TEXT = {
       { n: 6, suffix: ' AM', label: 'first session of the day' }
     ],
     space_kicker: '02 · The space', space_title: 'A gym guide', space_text: 'Scroll through the floor. Every corner was built on purpose.',
-    space_hint: 'Swipe, or use the arrows', space_more: 'Explore the full gallery', space_prev: 'Previous photo', space_next: 'Next photo',
+    space_hint: 'It moves on its own. Swipe, drag or use the arrows', space_more: 'Explore the full gallery', space_prev: 'Previous photo', space_next: 'Next photo',
     programs_kicker: '03 · Train', programs_title: 'Pick your weapon',
     programs_text: 'Strength, conditioning, combat and classes, all under one roof, with roaming coaches on the floor who help you for free.',
     amenities: ['Cafeteria', 'Lounge', 'Showers', 'Lockers', 'Free valet parking', 'Trial classes'],
@@ -102,7 +102,7 @@ const TEXT = {
       { n: 6, suffix: ' ص', label: 'أول تمرين في اليوم' }
     ],
     space_kicker: '٠٢ · المكان', space_title: 'جولة في النادي', space_text: 'تصفّح الصالة. كل زاوية بُنيت بقصد.',
-    space_hint: 'اسحب، أو استخدم الأسهم', space_more: 'استكشف المعرض كاملاً', space_prev: 'الصورة السابقة', space_next: 'الصورة التالية',
+    space_hint: 'بتتحرك لحالها. اسحب أو استخدم الأسهم', space_more: 'استكشف المعرض كاملاً', space_prev: 'الصورة السابقة', space_next: 'الصورة التالية',
     programs_kicker: '٠٣ · تمرّن', programs_title: 'اختر سلاحك',
     programs_text: 'قوة ولياقة وقتال وحصص جماعية، كلها تحت سقف واحد، مع مدربين متجوّلين في الصالة بيساعدوك مجاناً.',
     amenities: ['كافتيريا', 'صالة استراحة', 'حمامات', 'خزائن', 'فاليه مجاني', 'حصص تجريبية'],

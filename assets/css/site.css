@@ -176,7 +176,8 @@ html[lang="ar"] .tour-hint { letter-spacing: 0; }
 .tour-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; }
 .tour-viewport::-webkit-scrollbar { display: none; }
 /* Touch screens: JS slider (one swipe = one photo); vertical page scroll still passes through. */
-.tour-viewport.is-slider { overflow: hidden; scroll-snap-type: none; touch-action: pan-y; }
+.tour-viewport.is-slider { overflow: hidden; scroll-snap-type: none; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.tour-viewport.is-dragging { cursor: grabbing; }
 .tour-viewport.is-slider .tour-track { will-change: transform; transition: none; }
 .tour-viewport.is-slider .tour-item img { transition: none; will-change: transform; transform: scale(1.2); backface-visibility: hidden; }
 .tour-viewport.is-slider .tour-item { scroll-snap-align: none; }
