@@ -282,6 +282,7 @@
   // when the gym is closed they say so, and if the count can't be read they fall back to the plain label.
   (function liveCount() {
     const bubble = $('#live-bubble'), count = $('#live-count'), label = $('#live-label');
+    if (BUSINESS.liveUrl) bubble.href = BUSINESS.liveUrl;
     if (!BUSINESS.liveSource) return;
     const show = (row) => {
       const n = row ? Number(row.count) : NaN;

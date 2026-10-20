@@ -5,8 +5,16 @@
 const BUSINESS = {
   name: 'Apollo Training Facility',
   timezone: 'Asia/Amman',
-  whatsapp: '962799792078',            // Apollo Live: Apollo's own counter keeps the number in a Supabase table, and its public page reads it with
+  whatsapp: '962799792078',            // "Book your tour" number from the Instagram posts (+962 79 979 2078)
+  phone: '+96265861393',               // 06 586 1393 (Google listing + website)
+  phoneDisplay: '06 586 1393',
+  mobileDisplay: '+962 79 979 2078',
+  email: 'info@apollotf.com',
+  instagram: 'https://www.instagram.com/apollogym.jo/',
+  facebook: 'https://www.facebook.com/atf.jo/',
+  // Apollo Live: Apollo's own counter keeps the number in a Supabase table, and its public page reads it with
   // this publishable key, which is designed to be exposed in a browser. We read the same row (count, is_open).
+  // Tapping the bubble opens liveUrl, Apollo's own live page.
   liveSource: 'https://czpbmiwvtvhutvmgatjr.supabase.co/rest/v1/live_count?select=count,updated_at,is_open&id=eq.1',
   liveKey: 'sb_publishable_kIMibqpPi9I51C9WlFLGTA_7AStfUJ4',
   liveUrl: 'https://www.apollotrainingfacility.com/live',
