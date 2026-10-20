@@ -7,6 +7,7 @@ Preview: https://labsuncut.github.io/site-apollo-gym-amman/
 - All words (English and Arabic), hours and class times live in `assets/js/content.js`.
 - Items marked PLACEHOLDER are waiting for real information from Apollo.
 - Photos go in `assets/img/`; point the `img` fields in `content.js` at them.
+- The live member count (the corner bubble) is read from Apollo's own counter: a Supabase table that its public live page uses, updated by Apollo's staff. `liveSource` and `liveKey` in `content.js` point at it; if Apollo moves the counter, update those two values.
 
 ## Opening intro
 

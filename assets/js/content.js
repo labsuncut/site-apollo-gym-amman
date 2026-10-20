@@ -5,17 +5,11 @@
 const BUSINESS = {
   name: 'Apollo Training Facility',
   timezone: 'Asia/Amman',
-  whatsapp: '962799792078',            // "Book your tour" number from the Instagram posts (+962 79 979 2078)
-  phone: '+96265861393',               // 06 586 1393 (Google listing + website)
-  phoneDisplay: '06 586 1393',
-  mobileDisplay: '+962 79 979 2078',
-  email: 'info@apollotf.com',
-  instagram: 'https://www.instagram.com/apollogym.jo/',
-  facebook: 'https://www.facebook.com/atf.jo/',
-  // Apollo Live: their live floor counter. The bubble opens this page in a panel. If Apollo gives us a JSON
-  // endpoint for the number (e.g. { "count": 42 }), put its URL in liveCountUrl and the bubble shows the count.
+  whatsapp: '962799792078',            // Apollo Live: Apollo's own counter keeps the number in a Supabase table, and its public page reads it with
+  // this publishable key, which is designed to be exposed in a browser. We read the same row (count, is_open).
+  liveSource: 'https://czpbmiwvtvhutvmgatjr.supabase.co/rest/v1/live_count?select=count,updated_at,is_open&id=eq.1',
+  liveKey: 'sb_publishable_kIMibqpPi9I51C9WlFLGTA_7AStfUJ4',
   liveUrl: 'https://www.apollotrainingfacility.com/live',
-  liveCountUrl: '',
   google: 'https://www.google.com/maps/search/?api=1&query=Apollo+Training+Facility+Mecca+Street+Amman',
   mapEmbed: 'https://www.google.com/maps?q=Apollo+Training+Facility,+Mecca+Street,+Al+Sayegh+Commercial+Complex,+Amman&output=embed',
   // Opening hours, Sunday first: [open, close] in 24h. '00:00' as a close means midnight. Confirmed by the owner (2026-10-18).
@@ -63,8 +57,7 @@ const TEXT = {
     enquire_note: 'Open Saturday to Thursday from 6 AM, Friday from 11 AM.',
     faq_kicker: '07 · FAQ', faq_title: 'Good questions',
     faq_text: 'The things people ask before their first visit. Anything else, send a message.',
-    live_title: 'Apollo Live', live_text: 'How busy the floor is right now, straight from the gym.',
-    live_bubble: 'Live floor', live_members: 'on the floor',
+    live_bubble: 'Live floor', live_members: 'on the floor', live_closed: 'Closed now',
     quotes_prev: 'Previous review', quotes_next: 'Next review',
     social_instagram: 'Apollo on Instagram', social_facebook: 'Apollo on Facebook', facebook: 'Facebook',
     visit_kicker: '08 · Visit', visit_title: 'Come see it',
@@ -122,8 +115,7 @@ const TEXT = {
     enquire_note: 'نفتح من السبت إلى الخميس من ٦ صباحاً، والجمعة من ١١ صباحاً.',
     faq_kicker: '٠٧ · الأسئلة الشائعة', faq_title: 'أسئلة بمحلها',
     faq_text: 'الأشياء التي يسألها الناس قبل أول زيارة. أي شيء آخر، ابعث رسالة.',
-    live_title: 'أبولو مباشر', live_text: 'كم الصالة مزدحمة الآن، مباشرة من النادي.',
-    live_bubble: 'الصالة مباشر', live_members: 'في الصالة',
+    live_bubble: 'الصالة مباشر', live_members: 'في الصالة', live_closed: 'مغلق الآن',
     quotes_prev: 'الرأي السابق', quotes_next: 'الرأي التالي',
     social_instagram: 'أبولو على إنستغرام', social_facebook: 'أبولو على فيسبوك', facebook: 'فيسبوك',
     visit_kicker: '٠٨ · زورونا', visit_title: 'تعال شوفه بنفسك',
@@ -222,7 +214,7 @@ const FAQ = [
   { en: ['When are you open?', 'Saturday to Thursday from 6:00 AM to midnight, and Friday from 11:00 AM to 7:00 PM.'], ar: ['متى تفتحون؟', 'من السبت إلى الخميس من ٦:٠٠ صباحاً حتى ١٢:٠٠ منتصف الليل، والجمعة من ١١:٠٠ صباحاً حتى ٧:٠٠ مساءً.'] },
   { en: ['Can I try before I join?', 'Yes. Trial classes are available. Message us on WhatsApp and we will book you in.'], ar: ['هل أقدر أجرّب قبل الاشتراك؟', 'نعم. الحصص التجريبية متاحة. ابعث لنا على واتساب ونحجز لك.'] },
   { en: ['How do I join?', 'Call Apollo or message the team on WhatsApp. They will explain how membership works and invite you to come and see the place.'], ar: ['كيف أنضم؟', 'اتصل بأبولو أو ابعث للفريق على واتساب. بيشرحولك كيف بتمشي العضوية وبيدعوك تزور المكان.'] },
-  { en: ['Is it busy right now?', 'Apollo Live sits at the top of this page and shows how full the floor is at this moment.'], ar: ['هل الصالة مزدحمة الآن؟', 'أبولو مباشر موجود أعلى هذه الصفحة وبيعرض لك كم الصالة ممتلئة في هذه اللحظة.'] },
+  { en: ['Is it busy right now?', 'Look at the bottom corner of this page: the live number shows how many members are on the floor right now.'], ar: ['هل الصالة مزدحمة الآن؟', 'شوف زاوية الصفحة من تحت: الرقم المباشر بيعرض كم عضو على الأرض هالحظة.'] },
   { en: ['Do you have personal trainers?', 'Not as a paid extra. Apollo has roaming coaches on the floor who help members for free as part of membership.'], ar: ['هل عندكم مدربين شخصيين؟', 'مش كخدمة مدفوعة. في أبولو مدربون متجوّلون في الصالة بيساعدوا الأعضاء مجاناً كجزء من العضوية.'] },
   { en: ['Where do I park?', 'Parking is inside the building, at Al Sayegh Commercial Complex #181 on Mecca Street, with a free valet on site.'], ar: ['وين أركن؟', 'الموقف داخل المبنى، في مجمع الصايغ التجاري رقم ١٨١ على شارع مكة، مع خدمة فاليه مجانية في الموقع.'] },
   { en: ['What is there besides the gym floor?', 'A cafeteria, a lounge, showers and lockers. Come early, stay late.'], ar: ['شو في غير صالة التمرين؟', 'كافتيريا وصالة استراحة ودُشّات وخزائن. تعال بكّير وابقَ لوقت متأخر.'] }

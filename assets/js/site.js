@@ -275,25 +275,27 @@
   $('#menu-close').addEventListener('click', () => setMenu(false));
   $$('.overlay a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
-  // ---------- Apollo Live: the gym's own live page sits on the homepage, scaled to fit ----------
-  // The owner asked for the number on the page itself: no popup, no new tab. The frame is laid out at
-  // 1280x720 and shrunk to the card's width so the whole page shows, and it loads once it is near the viewport.
-  (function liveEmbed() {
-    const box = $('#live-embed'), frame = $('#live-frame'), bubble = $('#live-bubble'), count = $('#live-count');
-    const size = () => isPhone() ? [960, 600] : [1280, 720]; // the page's virtual size; phones get a narrower one so the number reads bigger
-    const fit = () => { const [W, H] = size(); frame.style.width = `${W}px`; frame.style.height = `${H}px`; const sc = box.clientWidth / W; frame.style.transform = `scale(${sc})`; box.style.height = `${Math.round(H * sc)}px`; };
-    new ResizeObserver(fit).observe(box); fit();
-    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { frame.src = BUSINESS.liveUrl; io.disconnect(); } }, { rootMargin: '800px' });
-    io.observe(box);
-    bubble.addEventListener('click', () => { const card = $('.live-card'); setMenu(false); if (lenis) lenis.scrollTo(card, { offset: -90, duration: 1.2 }); else card.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-    // Live number in the bubble, only when Apollo gives us an endpoint for it.
-    if (BUSINESS.liveCountUrl) {
-      const pull = () => fetch(BUSINESS.liveCountUrl, { cache: 'no-store' }).then((r) => r.json()).then((d) => {
-        const n = Number(d.count ?? d.members ?? d.value);
-        if (!isNaN(n)) { count.textContent = n; count.hidden = false; bubble.title = `${n} ${T.live_members}`; }
-      }).catch(() => {});
-      pull(); setInterval(pull, 60000);
-    }
+  // ---------- Apollo Live: the number itself, small, always in view ----------
+  // Apollo's live page keeps its count in a Supabase table; the publishable key is public by design, so the
+  // site reads the row straight from the visitor's browser (no popup, no new tab) and refreshes it every
+  // minute while the page is visible (staff update it by hand, so faster would be pointless). The bubble in the corner and a line under the hero show the number;
+  // when the gym is closed they say so, and if the count can't be read they fall back to the plain label.
+  (function liveCount() {
+    const bubble = $('#live-bubble'), count = $('#live-count'), label = $('#live-label');
+    if (!BUSINESS.liveSource) return;
+    const show = (row) => {
+      const n = row ? Number(row.count) : NaN;
+      if (!Number.isInteger(n) || n < 0) { count.hidden = true; label.textContent = T.live_bubble; bubble.classList.remove('is-closed'); return; }
+      if (row.is_open === false) { count.hidden = true; label.textContent = T.live_closed; bubble.classList.add('is-closed'); return; }
+      bubble.classList.remove('is-closed');
+      count.textContent = n; count.hidden = false; label.textContent = T.live_members;
+    };
+    const pull = () => fetch(BUSINESS.liveSource, { headers: { apikey: BUSINESS.liveKey, accept: 'application/json' }, cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('live count'))))
+      .then((rows) => show(Array.isArray(rows) ? rows[0] : null)).catch(() => show(null));
+    pull();
+    setInterval(() => { if (!document.hidden) pull(); }, 60000);
+    addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
   })();
 
   // ---------- Header shadow ----------

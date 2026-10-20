@@ -275,8 +275,9 @@ html[dir="rtl"] .arrow-trail { background: linear-gradient(to left, transparent,
 @keyframes target-ripple { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(3.2); } }
 
 /* ---------- Apollo Live bubble + panel ---------- */
-.live-bubble { position: fixed; z-index: 35; inset-inline-start: 20px; bottom: max(20px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(14,14,16,.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #fff; font: inherit; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .3s var(--ease), border-color .2s; }
-.live-bubble:hover, .live-bubble:focus-visible { transform: translateY(-2px); border-color: rgba(255,45,63,.6); outline: none; }
+.live-bubble { position: fixed; z-index: 35; inset-inline-start: 20px; bottom: max(20px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(14,14,16,.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #fff; font: inherit; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .3s var(--ease), border-color .2s; }
+.live-bubble.is-closed { color: var(--muted); }
+.live-bubble.is-closed i { background: var(--muted); animation: none; box-shadow: none; }
 .live-bubble i { width: 10px; height: 10px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 0 0 rgba(255,45,63,.6); animation: nav-pulse 1.8s ease-out infinite; }
 .live-bubble-count { font-family: var(--display); font-weight: 900; font-size: 1.15rem; letter-spacing: 0; color: var(--neon); }
 html[lang="ar"] .live-bubble { letter-spacing: 0; font-size: .9rem; }
@@ -404,20 +405,6 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 @keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Live ---------- */
-.live { color: #fff; padding: 26px 0 0; }
-.live-card { background: var(--red); border-radius: var(--radius); padding: 22px 22px 18px; box-shadow: 0 30px 80px rgba(212, 31, 44, .18); }
-.live-head { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-.live-pulse { position: relative; flex: none; width: 22px; height: 22px; }
-.live-pulse i, .live-pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #fff; }
-.live-pulse::before { animation: pulse 1.8s ease-out infinite; }
-.live-copy h2 { margin: 0 0 4px; font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: clamp(1.3rem, 2.6vw, 1.8rem); }
-html[lang="ar"] .live-copy h2 { text-transform: none; letter-spacing: 0; }
-.live-copy p { margin: 0; color: #fff; }
-/* Apollo's live page is rendered at 1280x720 and shrunk to the card width, so the whole number shows at any size */
-.live-embed { position: relative; overflow: hidden; border-radius: 12px; background: #0a0a0b; direction: ltr; }
-.live-frame { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; border: 0; transform-origin: 0 0; background: #0a0a0b; }
-.nav-live { display: inline-flex; align-items: center; gap: 8px; }
-.nav-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 0 0 rgba(255,45,63,.6); animation: nav-pulse 1.8s ease-out infinite; }
 @keyframes nav-pulse { from { box-shadow: 0 0 0 0 rgba(255,45,63,.6); } to { box-shadow: 0 0 0 10px rgba(255,45,63,0); } }
 
 /* ---------- Franchise ---------- */
@@ -429,7 +416,7 @@ html[lang="ar"] .live-copy h2 { text-transform: none; letter-spacing: 0; }
 
 /* ---------- Motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track, .scroll-cue i, .live-pulse::before, .nav-live i, .live-bubble i { animation: none; transform: none !important; }
+  .marquee-track, .scroll-cue i, .live-bubble i { animation: none; transform: none !important; }
   .faq-item summary i svg, .faq-item summary i::after { animation: none; }
   .beacon-on, .loader-skip { opacity: 1; }
   .beacon-halo { opacity: .9; }
@@ -471,9 +458,6 @@ html[lang="ar"] .live-copy h2 { text-transform: none; letter-spacing: 0; }
   .tour-viewport { scroll-snap-type: x mandatory; scroll-padding-inline: 24px; }
   .tour-track { gap: 12px; }
   .tour-item { width: calc(100vw - 48px); height: auto; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; }
-  .live-card { padding: 14px 14px 12px; }
-  .live-head { gap: 12px; margin-bottom: 12px; }
-  .live-copy p { font-size: .92rem; }
   .header-actions { gap: 4px; }
   .socials { margin-inline-end: 0; gap: 0; }
   .social { width: 32px; height: 32px; }

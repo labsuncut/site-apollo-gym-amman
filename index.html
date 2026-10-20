@@ -80,7 +80,6 @@
         <a href="#membership" data-t="nav_plans"></a>
         <a href="#faq" data-t="nav_faq"></a>
         <a href="#visit" data-t="nav_visit"></a>
-        <a class="nav-live" href="#live"><i></i><span data-t="nav_live"></span></a>
       </nav>
       <div class="header-actions">
           <div class="socials" aria-label="Apollo on social media">
@@ -107,7 +106,6 @@
       <a href="#faq" data-t="nav_faq"></a>
       <a href="#visit" data-t="nav_visit"></a>
       <a href="#franchise" data-t="nav_franchise"></a>
-      <a class="nav-live" href="#live"><i></i><span data-t="nav_live"></span></a>
     </nav>
     <a class="btn btn-big tel-link overlay-cta" href="#" data-t="enquire_call"></a>
     <div class="socials overlay-socials" aria-label="Apollo on social media">
@@ -145,19 +143,6 @@
         </div>
       </div>
       <a class="scroll-cue" href="#stats"><span data-t="scroll"></span><i></i></a>
-    </section>
-
-    <!-- LIVE: the gym's own live counter on the page itself. The owner asked for the number here, no popup, no new tab -->
-    <section class="live" id="live">
-      <div class="wrap">
-        <div class="live-card reveal">
-          <div class="live-head">
-            <div class="live-pulse" aria-hidden="true"><i></i></div>
-            <div class="live-copy"><h2 data-t="live_title"></h2><p data-t="live_text"></p></div>
-          </div>
-          <div class="live-embed" id="live-embed"><iframe class="live-frame" id="live-frame" title="Apollo Live" loading="lazy" src="about:blank"></iframe></div>
-        </div>
-      </div>
     </section>
 
     <!-- MARQUEE -->
@@ -339,10 +324,10 @@
   </footer>
 
   <!-- Sticky WhatsApp bar on phones -->
-  <!-- Apollo Live bubble: always in view. Click scrolls to the live counter at the top of the page -->
-  <button class="live-bubble" id="live-bubble" type="button">
-    <i aria-hidden="true"></i><span class="live-bubble-count" id="live-count" hidden></span><span class="live-bubble-label" data-t="live_bubble"></span>
-  </button>
+  <!-- Apollo Live: the number of members on the floor right now, always in view (read from Apollo's own counter) -->
+  <div class="live-bubble" id="live-bubble" role="status" aria-live="polite">
+    <i aria-hidden="true"></i><span class="live-bubble-count" id="live-count" hidden></span><span class="live-bubble-label" id="live-label" data-t="live_bubble"></span>
+  </div>
   <nav class="call-bar-wrap" aria-label="Call Apollo"><a class="call-bar tel-link" href="#" data-t="enquire_call"></a></nav>
 
   <script src="assets/js/vendor/gsap.min.js"></script>
