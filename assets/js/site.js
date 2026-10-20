@@ -35,7 +35,7 @@
   $$('.mail-link').forEach((a) => { a.href = `mailto:${BUSINESS.email}`; });
   $$('.map-link').forEach((a) => { a.href = BUSINESS.google; });
   $('#google-link').href = BUSINESS.google;
-  $('#contact-lines').innerHTML = `<a href="tel:${esc(BUSINESS.phone)}" dir="ltr">${esc(BUSINESS.phoneDisplay)}</a> · <a href="https://wa.me/${esc(BUSINESS.whatsapp)}" dir="ltr">${esc(BUSINESS.mobileDisplay)}</a><br><a href="mailto:${esc(BUSINESS.email)}">${esc(BUSINESS.email)}</a>`;
+  $('#contact-lines').innerHTML = `<a href="tel:${esc(BUSINESS.phone)}" dir="ltr">${esc(BUSINESS.phoneDisplay)}</a> · <a href="https://wa.me/${esc(BUSINESS.whatsapp)}" target="_blank" rel="noopener" dir="ltr">${esc(BUSINESS.mobileDisplay)}</a><br><a href="mailto:${esc(BUSINESS.email)}">${esc(BUSINESS.email)}</a>`;
   const map = $('#map');
   const loadMap = () => { if (map.src === 'about:blank') map.src = BUSINESS.mapEmbed; };
   if ('IntersectionObserver' in window) new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { loadMap(); o.disconnect(); } }, { rootMargin: '600px' }).observe(map);

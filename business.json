@@ -1,17 +1,41 @@
 {
-  "_note": "Facts about Apollo. Empty fields are waiting for the client; never guess them. The site reads its words from assets/js/content.js.",
-  "name": "Apollo",
-  "tagline": "",
+  "_note": "Facts about Apollo, from its website, Instagram, Google listing and the owner (2026-10-18). Empty fields are waiting for the client; never guess them. The site reads its words from assets/js/content.js.",
+  "name": "Apollo Training Facility",
+  "tagline": "Rule your destiny. Defy the limits.",
   "category": "Gym",
-  "phone": "",
-  "whatsapp": "",
-  "email": "",
-  "address": { "street": "", "city": "Amman", "region": "", "postal": "", "country": "JO" },
-  "hours": [],
-  "services": ["Strength", "Cardio & conditioning", "Group classes", "Personal training"],
-  "about": "",
-  "reviews": [],
-  "colors": { "brand": "#e6b422", "accent": "#ff7a1a" },
-  "links": { "google": "", "instagram": "", "facebook": "", "order": "" },
+  "phone": "+96265861393",
+  "whatsapp": "+962799792078",
+  "email": "info@apollotf.com",
+  "address": {
+    "street": "Mecca Street, Al Sayegh Commercial Complex #181",
+    "city": "Amman",
+    "region": "",
+    "postal": "",
+    "country": "JO"
+  },
+  "hours": [
+    "Sa-Th 06:00-00:00",
+    "Fr 11:00-19:00"
+  ],
+  "services": [
+    "Strength",
+    "Cardio & conditioning",
+    "Combat",
+    "Group classes",
+    "Roaming coaches (free with membership)"
+  ],
+  "about": "A training community on Mecca Street, Amman: 840 m² of strength, conditioning, combat and classes, with a cafeteria, lounge, showers, lockers and parking in the building with a free valet.",
+  "reviews": "See assets/js/content.js (real Google and Instagram quotes only)",
+  "colors": {
+    "brand": "#ff2d3f",
+    "accent": "#ff2d3f"
+  },
+  "links": {
+    "google": "https://www.google.com/maps/search/?api=1&query=Apollo+Training+Facility+Mecca+Street+Amman",
+    "instagram": "https://www.instagram.com/apollogym.jo/",
+    "facebook": "https://www.facebook.com/atf.jo/",
+    "website": "https://www.apollotrainingfacility.com/",
+    "live": "https://www.apollotrainingfacility.com/live"
+  },
   "domain": ""
 }

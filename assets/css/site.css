@@ -444,7 +444,7 @@ html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
   body { font-size: 16px; }
   .nav, .header-actions .btn { display: none; }
   .burger { display: block; }
-  .hero { padding-bottom: 110px; }
+  .hero { padding-bottom: 150px; } /* clears the live bubble + call bar */
   .hero-foot { grid-template-columns: 1fr; gap: 20px; }
   .hero-actions { justify-content: flex-start; }
   .scroll-cue { display: none; }
