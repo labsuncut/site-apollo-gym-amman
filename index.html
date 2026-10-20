@@ -80,7 +80,7 @@
         <a href="#membership" data-t="nav_plans"></a>
         <a href="#faq" data-t="nav_faq"></a>
         <a href="#visit" data-t="nav_visit"></a>
-        <a class="nav-live live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
+        <a class="nav-live" href="#live"><i></i><span data-t="nav_live"></span></a>
       </nav>
       <div class="header-actions">
           <div class="socials" aria-label="Apollo on social media">
@@ -107,7 +107,7 @@
       <a href="#faq" data-t="nav_faq"></a>
       <a href="#visit" data-t="nav_visit"></a>
       <a href="#franchise" data-t="nav_franchise"></a>
-      <a class="nav-live live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener"><i></i><span data-t="nav_live"></span></a>
+      <a class="nav-live" href="#live"><i></i><span data-t="nav_live"></span></a>
     </nav>
     <a class="btn btn-big tel-link overlay-cta" href="#" data-t="enquire_call"></a>
     <div class="socials overlay-socials" aria-label="Apollo on social media">
@@ -145,6 +145,19 @@
         </div>
       </div>
       <a class="scroll-cue" href="#stats"><span data-t="scroll"></span><i></i></a>
+    </section>
+
+    <!-- LIVE: the gym's own live counter on the page itself. The owner asked for the number here, no popup, no new tab -->
+    <section class="live" id="live">
+      <div class="wrap">
+        <div class="live-card reveal">
+          <div class="live-head">
+            <div class="live-pulse" aria-hidden="true"><i></i></div>
+            <div class="live-copy"><h2 data-t="live_title"></h2><p data-t="live_text"></p></div>
+          </div>
+          <div class="live-embed" id="live-embed"><iframe class="live-frame" id="live-frame" title="Apollo Live" loading="lazy" src="about:blank"></iframe></div>
+        </div>
+      </div>
     </section>
 
     <!-- MARQUEE -->
@@ -197,20 +210,6 @@
           <div class="program-stage reveal" id="program-stage" aria-hidden="true"></div>
         </div>
         <ul class="amenities reveal" id="amenities"></ul>
-      </div>
-    </section>
-
-    <!-- ETHOS: stacked cards -->
-    <section class="section ethos-section" id="ethos">
-      <div class="wrap">
-        <p class="kicker reveal" data-t="ethos_kicker"></p>
-        <h2 class="split" data-t="ethos_title"></h2>
-        <p class="lead reveal" data-t="ethos_text"></p>
-        <div class="ethos-stack" id="ethos-stack"></div>
-        <div class="values reveal">
-          <p class="values-title" data-t="values_title"></p>
-          <div class="values-row" id="values"></div>
-        </div>
       </div>
     </section>
 
@@ -277,20 +276,6 @@
       </div>
     </section>
 
-    <!-- LIVE -->
-    <section class="live" id="live">
-      <div class="wrap">
-        <div class="live-row reveal">
-          <div class="live-pulse" aria-hidden="true"><i></i></div>
-          <div class="live-copy">
-            <h2 data-t="live_title"></h2>
-            <p data-t="live_text"></p>
-          </div>
-          <a class="btn live-btn live-open" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_cta"></a>
-        </div>
-      </div>
-    </section>
-
     <!-- VISIT -->
     <section class="section visit-section" id="visit">
       <div class="wrap">
@@ -354,20 +339,10 @@
   </footer>
 
   <!-- Sticky WhatsApp bar on phones -->
-  <!-- Apollo Live bubble: always in view. Click opens the live floor counter in a panel without leaving the site -->
-  <button class="live-bubble" id="live-bubble" type="button" aria-haspopup="dialog" aria-controls="live-panel" aria-expanded="false">
+  <!-- Apollo Live bubble: always in view. Click scrolls to the live counter at the top of the page -->
+  <button class="live-bubble" id="live-bubble" type="button">
     <i aria-hidden="true"></i><span class="live-bubble-count" id="live-count" hidden></span><span class="live-bubble-label" data-t="live_bubble"></span>
   </button>
-  <div class="live-panel" id="live-panel" role="dialog" aria-modal="true" aria-labelledby="live-panel-title" hidden>
-    <div class="live-panel-box">
-      <div class="live-panel-head">
-        <div><h2 id="live-panel-title" data-t="live_panel_title"></h2><p data-t="live_panel_text"></p></div>
-        <button class="round-btn" id="live-close" type="button"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      </div>
-      <iframe class="live-frame" id="live-frame" title="Apollo Live" loading="lazy" src="about:blank"></iframe>
-      <a class="text-link live-tab" id="live-tab" href="https://www.apollotrainingfacility.com/live" target="_blank" rel="noopener" data-t="live_open_tab"></a>
-    </div>
-  </div>
   <nav class="call-bar-wrap" aria-label="Call Apollo"><a class="call-bar tel-link" href="#" data-t="enquire_call"></a></nav>
 
   <script src="assets/js/vendor/gsap.min.js"></script>

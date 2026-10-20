@@ -32,7 +32,6 @@
   $$('.ig-link').forEach((a) => { a.href = BUSINESS.instagram; });
   $$('.fb-link').forEach((a) => { a.href = BUSINESS.facebook; });
   $$('[data-label]').forEach((el) => { el.setAttribute('aria-label', T[el.dataset.label] || ''); });
-  $$('.live-open, #live-tab').forEach((a) => { a.href = BUSINESS.liveUrl; });
   $$('.mail-link').forEach((a) => { a.href = `mailto:${BUSINESS.email}`; });
   $$('.map-link').forEach((a) => { a.href = BUSINESS.google; });
   $('#google-link').href = BUSINESS.google;
@@ -96,12 +95,6 @@
   });
   $('#amenities').innerHTML = T.amenities.map((a) => `<li>${esc(a)}</li>`).join('');
 
-  // ---------- Ethos ----------
-  $('#ethos-stack').innerHTML = ETHOS.map((e, i) => {
-    const [a, b, text] = e[lang];
-    return `<article class="ethos-card"><span class="ethos-num" aria-hidden="true" data-n="${pad(i + 1)}"></span><h3>${esc(a)}<em>${esc(b)}</em></h3><p>${esc(text)}</p></article>`;
-  }).join('');
-  $('#values').innerHTML = T.values.map((v) => `<span>${esc(v)}</span>`).join('');
 
   // ---------- Story ----------
   $('#timeline').style.setProperty('--n', STORY.length);
@@ -283,24 +276,17 @@
   $('#menu-close').addEventListener('click', () => setMenu(false));
   $$('.overlay a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
-  // ---------- Apollo Live: bubble + panel ----------
-  // The bubble stays in view; the panel shows Apollo's own live page in a frame, with a new-tab link as the fallback.
-  (function liveBubble() {
-    const bubble = $('#live-bubble'), panel = $('#live-panel'), frame = $('#live-frame'), count = $('#live-count');
-    let loaded = false;
-    const setPanel = (show) => {
-      panel.hidden = !show;
-      bubble.setAttribute('aria-expanded', String(show));
-      if (show && !loaded) { loaded = true; frame.src = BUSINESS.liveUrl; }
-      if (lenis) show ? lenis.stop() : lenis.start();
-      if (show) $('#live-close').focus(); else bubble.focus();
-    };
-    bubble.addEventListener('click', () => setPanel(panel.hidden));
-    $('#live-close').addEventListener('click', () => setPanel(false));
-    panel.addEventListener('click', (e) => { if (e.target === panel) setPanel(false); });
-    addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setPanel(false); });
-    $$('.live-open').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); setMenu(false); setPanel(true); }));
-    $('#live-close').setAttribute('aria-label', T.live_close);
+  // ---------- Apollo Live: the gym's own live page sits on the homepage, scaled to fit ----------
+  // The owner asked for the number on the page itself: no popup, no new tab. The frame is laid out at
+  // 1280x720 and shrunk to the card's width so the whole page shows, and it loads once it is near the viewport.
+  (function liveEmbed() {
+    const box = $('#live-embed'), frame = $('#live-frame'), bubble = $('#live-bubble'), count = $('#live-count');
+    const size = () => isPhone() ? [960, 600] : [1280, 720]; // the page's virtual size; phones get a narrower one so the number reads bigger
+    const fit = () => { const [W, H] = size(); frame.style.width = `${W}px`; frame.style.height = `${H}px`; const sc = box.clientWidth / W; frame.style.transform = `scale(${sc})`; box.style.height = `${Math.round(H * sc)}px`; };
+    new ResizeObserver(fit).observe(box); fit();
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { frame.src = BUSINESS.liveUrl; io.disconnect(); } }, { rootMargin: '800px' });
+    io.observe(box);
+    bubble.addEventListener('click', () => { const card = $('.live-card'); setMenu(false); if (lenis) lenis.scrollTo(card, { offset: -90, duration: 1.2 }); else card.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     // Live number in the bubble, only when Apollo gives us an endpoint for it.
     if (BUSINESS.liveCountUrl) {
       const pull = () => fetch(BUSINESS.liveCountUrl, { cache: 'no-store' }).then((r) => r.json()).then((d) => {
@@ -560,12 +546,6 @@
       if (k < .97) last.classList.remove('hit');
     }, onRefresh: () => q.measure() });
   })();
-
-  // ---------- Ethos cards shrink as the next one covers them ----------
-  $$('.ethos-card').forEach((card, i, all) => {
-    if (i === all.length - 1) return;
-    gsap.to(card, { scale: .96, ease: 'none', scrollTrigger: { trigger: all[i + 1], start: 'top 80%', end: 'top 20%', scrub: true } });
-  });
 
   // ---------- Slogan strip: slow, steady drift; scrolling nudges it at most 1.4x, eased ----------
   // Three copies of the words sit in the track, so moving by one third loops with no visible jump.
