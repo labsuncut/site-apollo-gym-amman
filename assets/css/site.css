@@ -361,7 +361,7 @@ html[lang="ar"] .visit-info h3 { letter-spacing: 0; font-size: .95rem; }
 .hours tr.is-today th::after { content: ' · ' attr(data-today); font-size: .8em; }
 .contact-links { display: flex; flex-wrap: wrap; gap: 10px; }
 .contact-lines { color: var(--muted); font-size: .95rem; margin: 14px 0 0; line-height: 1.8; }
-.contact-lines a { color: var(--ink); text-decoration: none; }
+.contact-lines a { color: var(--ink); text-decoration: none; display: inline-block; padding: 4px 0; } /* tap target at least 24px tall */
 .address { margin: 0 0 10px; font-size: 1.05rem; max-width: 24em; }
 .map { width: 100%; aspect-ratio: 4 / 3; border: 0; border-radius: var(--radius); filter: grayscale(1) invert(.92) contrast(1.1); background: var(--bg); min-height: 340px; }
 
@@ -382,7 +382,7 @@ html[lang="ar"] .final-word { text-transform: none; letter-spacing: 0; line-heig
 .footer-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); font-size: .85rem; }
 html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 .footer-credit { color: var(--muted); }
-.footer-links a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.footer-links a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 6px 0; } /* tap target at least 24px tall */
 .footer-links a:hover, .footer-links a:focus-visible { color: #fff; }
 
 /* ---------- Sticky WhatsApp bar, phones only ---------- */
