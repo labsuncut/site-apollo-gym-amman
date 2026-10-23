@@ -79,7 +79,7 @@ const TEXT = {
     franchise_cta: 'Ask on WhatsApp', franchise_mail: 'Email the team',
     final_word: 'Rise.', final_title: 'Your place in the family starts with a conversation.', final_cta: 'Enquire about membership',
     footer_name: 'Apollo Training Facility', footer_addr: 'Mecca Street, Amman',
-    footer_credit: 'By FellowFlow',
+    footer_credit: 'By FellowFlow', footer_privacy: 'Privacy policy',
     wa_msg: 'Hi Apollo! I saw the website and would like to come and see the place.',
     wa_member_msg: 'Hi Apollo! I saw the website and would like to ask about membership.'
   },
@@ -137,7 +137,7 @@ const TEXT = {
     franchise_cta: 'اسأل على واتساب', franchise_mail: 'راسل الفريق',
     final_word: 'ارتقِ.', final_title: 'مكانك في العائلة يبدأ بحديث.', final_cta: 'استفسر عن العضوية',
     footer_name: 'أبولو للتدريب', footer_addr: 'شارع مكة، عمّان',
-    footer_credit: 'من FellowFlow',
+    footer_credit: 'من FellowFlow', footer_privacy: 'سياسة الخصوصية',
     wa_msg: 'مرحباً أبولو! شفت الموقع وحاب أجي أشوف المكان.',
     wa_member_msg: 'مرحباً أبولو! شفت الموقع وحاب أسأل عن العضوية.'
   }

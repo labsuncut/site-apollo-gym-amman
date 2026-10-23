@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://labsuncut.github.io/site-apollo-gym-amman/sitemap.xml

@@ -8,8 +8,11 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // ?prerender: tools/prerender.mjs loads the page with this flag, lets the words and lists fill in, and saves
+  // the result into index.html so the content is in the HTML itself (for Google, AI crawlers and no-JS readers).
+  const prerender = /[?&]prerender\b/.test(location.search);
   const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
-  const motion = !calm && window.gsap;
+  const motion = !calm && !prerender && window.gsap;
   // Once per visit: remember in sessionStorage (cleared when the tab closes). If storage is blocked, the intro simply plays.
   const introSeen = () => { try { const v = sessionStorage.getItem('apollo-intro') === '1'; sessionStorage.setItem('apollo-intro', '1'); return v; } catch (e) { return false; } };
   const pad = (n) => String(n).padStart(2, '0');
@@ -67,7 +70,7 @@
     return `<div class="program reveal${i === 0 ? ' is-active' : ''}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><div class="program-desc" id="program-desc-${i}"><p>${esc(text)}</p></div><button class="program-arrow" type="button" aria-expanded="false" aria-controls="program-desc-${i}" aria-label="${esc(T.programs_about)} ${esc(name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
   }).join('');
   // The photo panel: one image per program, stacked; the active one fades in. Hover or keyboard focus picks it.
-  $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" alt="" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
+  $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" width="930" height="580" alt="" loading="lazy" decoding="async" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
   const stageImgs = $$('#program-stage img'), stageLabel = $('#program-stage-label');
   const pickProgram = (i) => {
     $$('.program').forEach((r, k) => r.classList.toggle('is-active', k === i));
@@ -97,6 +100,7 @@
 
   // ---------- Story ----------
   $('#timeline').style.setProperty('--n', STORY.length);
+  $('#timeline').innerHTML = '<i class="timeline-line"><b id="timeline-fill"></b></i>'; // start clean (the HTML may carry a prerendered copy)
   $('#timeline').insertAdjacentHTML('beforeend', STORY.map((s) => {
     const [title, text] = s[lang];
     return `<div class="milestone reveal"><b>${esc(s.y)}</b><h3>${esc(title)}</h3><p>${esc(text)}</p></div>`;
@@ -209,7 +213,7 @@
       $('#quotes-prev').addEventListener('click', () => nudge(-1));
       $('#quotes-next').addEventListener('click', () => nudge(1));
       addEventListener('resize', measure, { passive: true });
-      measure(); prevT = performance.now(); raf = requestAnimationFrame(tick);
+      if (!prerender) { measure(); prevT = performance.now(); raf = requestAnimationFrame(tick); }
       return;
     }
     track.innerHTML = html;
@@ -251,6 +255,7 @@
   };
   $('#hours').innerHTML = BUSINESS.hours.map((h, i) => `<tr${i === today ? ' class="is-today"' : ''}><th data-today="${esc(T.today)}">${esc(T.days[i])}</th><td dir="ltr">${h ? `${fmt(h[0])} – ${fmt(h[1])}` : (lang === 'ar' ? 'مغلق' : 'Closed')}</td></tr>`).join('');
   (function openBadge() {
+    if (prerender) return; // time-dependent: never baked into the HTML
     const el = $('#open');
     const m = now.getHours() * 60 + now.getMinutes();
     const toMin = (s) => { const [h, mm] = s.split(':').map(Number); return h * 60 + mm; };
@@ -317,7 +322,7 @@
   const build = () => {
     const one = SPACE.slice(0, shown).map(tourItem).join('');
     track.innerHTML = one + one.replace(/<figure class="tour-item"/g, '<figure class="tour-item is-copy" aria-hidden="true"');
-    $$('img', track).forEach((im) => { im.loading = 'eager'; im.draggable = false; });
+    if (!prerender) $$('img', track).forEach((im) => { im.loading = 'eager'; im.draggable = false; });
   };
   const measure = () => { const [a, b] = $$('.tour-item', track); gap = a && b ? Math.abs(b.getBoundingClientRect().left - a.getBoundingClientRect().left) : 400; period = gap * shown; imgs = $$('.tour-item img', track); };
   const norm = (x) => period ? ((x % period) + period) % period : x;
@@ -396,13 +401,14 @@
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
   addEventListener('resize', () => { const i = nearest(); measure(); pos = i * gap; paint(); }, { passive: true });
-  build(); measure(); paint(); prevT = performance.now(); requestAnimationFrame(tick);
+  build(); if (!prerender) { measure(); paint(); prevT = performance.now(); requestAnimationFrame(tick); }
 
   // ---------- No motion: show everything and stop ----------
   if (!motion) {
+    $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
+    if (prerender) { html.dataset.prerendered = '1'; return; } // tools/prerender.mjs reads the page now
     $$('.reveal, .hero-foot > *, .scroll-cue').forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
     $$('.display .line > span').forEach((el) => { el.style.transform = 'none'; el.style.opacity = 1; });
-    $$('.n').forEach((el) => { el.textContent = Number(el.dataset.n).toFixed(+el.dataset.dec); });
     const ld = $('#loader');
     // Reduced motion: the lit rooftop holds as a still, then dissolves. Still once per visit.
     if (introSeen()) ld.remove();

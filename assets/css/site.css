@@ -49,7 +49,7 @@ html[lang="ar"] .kicker { letter-spacing: 0; }
 .lead { color: var(--muted); max-width: 34em; font-size: 1.15rem; margin: 0 0 40px; }
 .text-link { color: var(--red-text); font-weight: 700; }
 .map-link { display: inline-block; padding: 8px 0; } /* tap target at least 24px tall */
-.program-arrow:focus-visible { outline: 2px solid var(--red-text); outline-offset: 4px; }
+.program-arrow:focus-visible, .program:focus-visible { outline: 2px solid var(--red-text); outline-offset: 4px; }
 .eyebrow { color: var(--red-text); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; margin: 0 0 18px; }
 html[lang="ar"] .eyebrow { letter-spacing: 0; }
 .ico { width: 20px; height: 20px; fill: currentColor; }
@@ -63,6 +63,7 @@ html:not(.js) .loader { display: none; }
 .beacon picture, .beacon img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .beacon img { object-fit: cover; object-position: 50% 50%; display: block; }
 .beacon-on, .beacon-halo, .beacon-spill { opacity: 0; }
+html:not(.js) .loader { display: none; } /* no JavaScript: no intro, the page simply shows */
 .loader-skip { position: absolute; inset-inline-end: max(20px, env(safe-area-inset-right)); bottom: max(22px, calc(env(safe-area-inset-bottom) + 14px)); margin: 0; z-index: 8; opacity: 0; font: inherit; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #fff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 12px 20px; cursor: pointer; }
 .loader-skip:hover, .loader-skip:focus-visible { background: rgba(255,255,255,.16); outline: none; border-color: rgba(255,255,255,.6); }
 html[lang="ar"] .loader-skip { letter-spacing: 0; font-size: .95rem; }
@@ -126,12 +127,13 @@ html[lang="ar"] .overlay-nav a { text-transform: none; letter-spacing: 0; }
 .display { font-family: var(--display); font-weight: 900; font-size: clamp(2.8rem, 7.6vw, 6.4rem); line-height: .94; text-transform: uppercase; letter-spacing: -.035em; margin: 0 0 40px; }
 html[lang="ar"] .display { text-transform: none; letter-spacing: 0; line-height: 1.15; font-size: clamp(2.6rem, 9vw, 7rem); }
 .display .line { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
-.display .line > span { display: block; transform: translateY(14px); opacity: 0; }
+.display .line > span { display: block; }
+.js .display .line > span { transform: translateY(14px); opacity: 0; } /* hidden until the motion plays; visible without JavaScript */
 .display em { font-style: normal; color: var(--red); }
 .hero-foot { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: end; }
 .hero-sub { color: var(--ink); opacity: .85; font-size: 1.15rem; max-width: 26em; margin: 0; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
-.hero-foot > * { opacity: 0; }
+.js .hero-foot > * { opacity: 0; }
 .open-badge { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); font-weight: 600; grid-column: 1 / -1; }
 .open-badge i { width: 9px; height: 9px; border-radius: 50%; background: #666; }
 .open-badge.is-open i { background: #37d67a; box-shadow: 0 0 0 4px rgba(55, 214, 122, .2); }
@@ -157,7 +159,7 @@ html[lang="ar"] .marquee-track { text-transform: none; letter-spacing: 0; }
 
 /* ---------- Sections ---------- */
 .section { padding: 120px 0; position: relative; }
-.reveal { opacity: 0; transform: translateY(26px); }
+.js .reveal { opacity: 0; transform: translateY(26px); }
 .split .line { overflow: hidden; display: block; padding-bottom: .08em; margin-bottom: -.08em; }
 
 /* ---------- Tour ---------- */
@@ -380,6 +382,8 @@ html[lang="ar"] .final-word { text-transform: none; letter-spacing: 0; line-heig
 .footer-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); font-size: .85rem; }
 html[lang="ar"] .footer-brand { text-transform: none; letter-spacing: 0; }
 .footer-credit { color: var(--muted); }
+.footer-links a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.footer-links a:hover, .footer-links a:focus-visible { color: #fff; }
 
 /* ---------- Sticky WhatsApp bar, phones only ---------- */
 .call-bar { display: none; }
