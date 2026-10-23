@@ -22,8 +22,8 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 await page.route(/^(?!http:\/\/localhost)/, (r) => r.abort()); // nothing leaves the machine
 await page.goto(`http://localhost:${port}/index.html?prerender=1`, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.documentElement.dataset.prerendered === '1', null, { timeout: 15000 });
-// Motion state must never be baked: strip any transform left on an element, then read the page.
-const body = await page.evaluate(() => { document.querySelectorAll('[style*="transform"]').forEach((el) => { el.style.transform = ''; if (!el.getAttribute('style')) el.removeAttribute('style'); }); return document.body.innerHTML; });
+// Scripts added at run time and motion state must never be baked: drop them, strip any transform left on an element, then read the page.
+const body = await page.evaluate(() => { document.querySelectorAll('script[data-dyn]').forEach((el) => el.remove()); document.querySelectorAll('[style*="transform"]').forEach((el) => { el.style.transform = ''; if (!el.getAttribute('style')) el.removeAttribute('style'); }); return document.body.innerHTML; });
 await browser.close(); server.close();
 
 const file = join(root, 'index.html');
