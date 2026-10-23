@@ -66,7 +66,7 @@
       <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-off-phone.png"><img class="beacon-off" src="assets/img/intro/sign-off-desk.png" alt="" decoding="async" width="1344" height="752"></picture>
       <picture><source media="(orientation: portrait)" srcset="assets/img/intro/spill-phone.png"><img class="beacon-spill" src="assets/img/intro/spill-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
       <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-halo-phone.png"><img class="beacon-halo" src="assets/img/intro/sign-halo-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
-      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-on-phone.png"><img class="beacon-on" id="beacon-on" src="assets/img/intro/sign-on-desk.png" alt="" fetchpriority="high" decoding="async" width="1344" height="752"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-on-phone.png"><img class="beacon-on" id="beacon-on" src="assets/img/intro/sign-on-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
     </div>
     <button class="loader-skip" id="loader-skip" type="button" data-t="loader_skip">Skip intro</button>
   </div>
@@ -372,8 +372,13 @@ Thank you to the entire Apollo team for creating such a special place. I wholehe
         if (started) return; started = true;
         files.forEach(function (f) { var s = document.createElement('script'); s.src = f; s.async = false; s.setAttribute('data-dyn', ''); document.body.appendChild(s); });
       }
-      if (window.requestAnimationFrame) requestAnimationFrame(function () { requestAnimationFrame(go); });
-      setTimeout(go, 400); // background tab or no frame yet: do not wait forever
+      try {
+        new PerformanceObserver(function (list) {
+          if (list.getEntries().some(function (e) { return e.name === 'first-contentful-paint'; })) setTimeout(go, 0);
+        }).observe({ type: 'paint', buffered: true });
+      } catch (e) { setTimeout(go, 0); }
+      window.addEventListener('load', go); // background tab or no paint event: do not wait forever
+      setTimeout(go, 2500);
     })();
   </script>
 </body>
