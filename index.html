@@ -63,10 +63,10 @@
   <div class="loader" id="loader">
     <div class="beacon" aria-hidden="true">
       <picture><source media="(orientation: portrait)" srcset="assets/img/intro/roof-phone.webp"><img class="beacon-roof" id="beacon-roof" src="assets/img/intro/roof-desk.webp" alt="" fetchpriority="high" decoding="async" width="1344" height="752"></picture>
-      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-off-phone.png"><img class="beacon-off" src="assets/img/intro/sign-off-desk.png" alt="" decoding="async" width="1344" height="752"></picture>
-      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/spill-phone.png"><img class="beacon-spill" src="assets/img/intro/spill-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
-      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-halo-phone.png"><img class="beacon-halo" src="assets/img/intro/sign-halo-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
-      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-on-phone.png"><img class="beacon-on" id="beacon-on" src="assets/img/intro/sign-on-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
+      <picture><source media="(orientation: portrait)" srcset="assets/img/intro/sign-off-phone.png"><img class="beacon-off" src="assets/img/intro/sign-off-desk.png" alt="" fetchpriority="low" decoding="async" width="1344" height="752"></picture>
+      <picture><source media="(orientation: portrait)" data-phone="assets/img/intro/spill-phone.png"><img class="beacon-spill" data-desk="assets/img/intro/spill-desk.png" alt="" decoding="async" width="1344" height="752"></picture>
+      <picture><source media="(orientation: portrait)" data-phone="assets/img/intro/sign-halo-phone.png"><img class="beacon-halo" data-desk="assets/img/intro/sign-halo-desk.png" alt="" decoding="async" width="1344" height="752"></picture>
+      <picture><source media="(orientation: portrait)" data-phone="assets/img/intro/sign-on-phone.png"><img class="beacon-on" id="beacon-on" data-desk="assets/img/intro/sign-on-desk.png" alt="" decoding="async" width="1344" height="752"></picture>
     </div>
     <button class="loader-skip" id="loader-skip" type="button" data-t="loader_skip">Skip intro</button>
   </div>
@@ -126,7 +126,7 @@
         <!-- PLACEHOLDER image: frame from Apollo's own Instagram gym guide -->
         <picture>
           <source media="(max-width: 720px)" srcset="assets/img/red-weights.webp" id="hero-source">
-          <img class="hero-photo" id="hero-photo" src="assets/img/hero-cardio.webp" width="1860" height="1160" alt="" fetchpriority="high" style="object-position: 50% 45%;">
+          <img class="hero-photo" id="hero-photo" src="assets/img/hero-cardio.webp" width="1860" height="1160" alt="" loading="lazy" fetchpriority="high" style="object-position: 50% 45%;">
         </picture>
         <div class="hero-shade"></div>
         <div class="sun" id="sun"></div>
@@ -362,7 +362,7 @@ Thank you to the entire Apollo team for creating such a special place. I wholehe
   </a>
   <nav class="call-bar-wrap" aria-label="Call Apollo"><a class="call-bar tel-link" href="tel:+96265861393" data-t="enquire_call">Call Apollo</a></nav>
 
-  <!-- The motion scripts load after the first frame is on screen, so the intro overlay and the hero text appear as early as the
+  <!-- The motion scripts (and the later intro layers) load after the first frame is on screen, so the intro overlay and the hero text appear as early as the
        network allows and the browser records that early paint as the page's largest paint. Order is kept (async = false). -->
   <script>
     (function () {
@@ -370,6 +370,11 @@ Thank you to the entire Apollo team for creating such a special place. I wholehe
       var started = false;
       function go() {
         if (started) return; started = true;
+        // The three intro layers that light up later are fetched now too; they are needed only once the motion script runs.
+        Array.prototype.forEach.call(document.querySelectorAll('img[data-desk]'), function (im) {
+          var src = im.previousElementSibling; if (src && src.dataset.phone) src.srcset = src.dataset.phone;
+          im.src = im.dataset.desk;
+        });
         files.forEach(function (f) { var s = document.createElement('script'); s.src = f; s.async = false; s.setAttribute('data-dyn', ''); document.body.appendChild(s); });
       }
       try {
@@ -377,8 +382,7 @@ Thank you to the entire Apollo team for creating such a special place. I wholehe
           if (list.getEntries().some(function (e) { return e.name === 'first-contentful-paint'; })) setTimeout(go, 0);
         }).observe({ type: 'paint', buffered: true });
       } catch (e) { setTimeout(go, 0); }
-      window.addEventListener('load', go); // background tab or no paint event: do not wait forever
-      setTimeout(go, 2500);
+      setTimeout(go, 3000); // background tab or no paint event: do not wait forever
     })();
   </script>
 </body>

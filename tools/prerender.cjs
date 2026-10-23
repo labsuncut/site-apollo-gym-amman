@@ -23,7 +23,7 @@ await page.route(/^(?!http:\/\/localhost)/, (r) => r.abort()); // nothing leaves
 await page.goto(`http://localhost:${port}/index.html?prerender=1`, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.documentElement.dataset.prerendered === '1', null, { timeout: 15000 });
 // Scripts added at run time and motion state must never be baked: drop them, strip any transform left on an element, then read the page.
-const body = await page.evaluate(() => { document.querySelectorAll('script[data-dyn]').forEach((el) => el.remove()); document.querySelectorAll('[style*="transform"]').forEach((el) => { el.style.transform = ''; if (!el.getAttribute('style')) el.removeAttribute('style'); }); return document.body.innerHTML; });
+const body = await page.evaluate(() => { document.querySelectorAll('script[data-dyn]').forEach((el) => el.remove()); document.querySelectorAll('img[data-desk]').forEach((im) => { im.removeAttribute('src'); const so = im.previousElementSibling; if (so) so.removeAttribute('srcset'); }); document.querySelectorAll('[style*="transform"]').forEach((el) => { el.style.transform = ''; if (!el.getAttribute('style')) el.removeAttribute('style'); }); return document.body.innerHTML; });
 await browser.close(); server.close();
 
 const file = join(root, 'index.html');
