@@ -57,7 +57,7 @@
   if ($('#hero-source')) $('#hero-source').srcset = IMAGES.heroPhone.src;
 
   // ---------- Gallery: highlights first, the rest on request ----------
-  const tourItem = (s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" width="${s.w}" height="${s.h}" style="object-position:${esc(s.focus)}" alt="${esc(s[lang])}" loading="${i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`;
+  const tourItem = (s, i) => `<figure class="tour-item"><img src="${esc(s.img)}" width="${s.w}" height="${s.h}" style="object-position:${esc(s.focus)}" alt="${esc(s[lang])}" loading="${!prerender && i < 2 ? 'eager' : 'lazy'}"><figcaption><b>${pad(i + 1)}</b>${esc(s[lang])}</figcaption></figure>`;
   let shown = Math.min(SPACE_HIGHLIGHTS, SPACE.length);
   $('#tour-total').textContent = pad(shown);
   $('#tour-more').hidden = shown >= SPACE.length;
@@ -67,7 +67,7 @@
   // ---------- Programs ----------
   $('#programs-list').innerHTML = PROGRAMS.map((p, i) => {
     const [name, text] = p[lang];
-    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" alt="" loading="lazy"></span><h3>${esc(name)}</h3><div class="program-desc" id="program-desc-${i}"><p>${esc(text)}</p></div><button class="program-arrow" type="button" aria-expanded="false" aria-controls="program-desc-${i}" aria-label="${esc(T.programs_about)} ${esc(name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
+    return `<div class="program reveal${i === 0 ? ' is-active' : ''}" data-i="${i}"><span class="program-num">${pad(i + 1)}</span><span class="program-mini"><img src="${esc(p.img)}" width="930" height="580" alt="" loading="lazy" decoding="async"></span><h3>${esc(name)}</h3><div class="program-desc" id="program-desc-${i}"><p>${esc(text)}</p></div><button class="program-arrow" type="button" aria-expanded="false" aria-controls="program-desc-${i}" aria-label="${esc(T.programs_about)} ${esc(name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
   }).join('');
   // The photo panel: one image per program, stacked; the active one fades in. Hover or keyboard focus picks it.
   $('#program-stage').innerHTML = PROGRAMS.map((p, i) => `<img src="${esc(p.img)}" width="930" height="580" alt="" loading="lazy" decoding="async" class="${i === 0 ? 'is-active' : ''}">`).join('') + '<span class="program-stage-label" id="program-stage-label"></span>';
