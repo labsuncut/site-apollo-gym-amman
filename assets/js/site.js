@@ -449,6 +449,10 @@
   // The beacon plays once per visit (team decision 2026-10-16): a refresh or a language switch goes straight to the homepage.
   const seen = introSeen();
   const finishIntro = () => { if (loader.isConnected) loader.remove(); lenis.start(); ScrollTrigger.refresh(); };
+  // Hide the hero text only now, in the same tick that decides the intro: the CSS leaves it painted so the browser records
+  // it as the largest paint early (behind the overlay) instead of when the motion reveals it seconds later.
+  gsap.set('.display .line > span', { y: 14, opacity: 0 });
+  gsap.set('.hero-foot > *', { opacity: 0 });
   const heroIn = (tl, at) => tl
     .to('.display .line > span', { y: 0, opacity: 1, duration: .9, ease: 'power2.out', stagger: .08 }, at)
     .to('.hero-foot > *', { opacity: 1, duration: .8, stagger: .08, ease: 'power2.out' }, at + .25)
